@@ -37,5 +37,18 @@ getSabapData <- function(spp_code, region_type = c("country", "province", "penta
     utils::read.csv(header = TRUE) %>%
     dplyr::as_tibble()
 
+  out <- out %>%
+    readr::type_convert(col_types = readr::cols(
+      .default = readr::col_integer(),
+      CardNo = readr::col_character(),
+      StartDate = readr::col_date(format = ""),
+      EndDate = readr::col_date(format = ""),
+      StartTime = readr::col_character(),
+      Pentad = readr::col_character(),
+      Spp = readr::col_character(),
+      Sequence = readr::col_character(),
+      Common_name = readr::col_character(),
+      Taxonomic_name = readr::col_character()))
+
   return(out)
 }
