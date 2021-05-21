@@ -84,6 +84,30 @@ use_test()
 test()
 
 
+# Function getSabapData --------------------------------------------------
+
+# Add function
+use_r("getSabapData")
+
+# test locally
+load_all()
+
+getSabapData(123, region_type = "pentad", region = "2505_2850")
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
+
 # Install -----------------------------------------------------------------
 
 devtools::install()
