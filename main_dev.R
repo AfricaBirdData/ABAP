@@ -23,7 +23,6 @@ use_mit_license("BIRDIE Development Team")
 # Remember to edit the DESCRIPTION file
 
 
-
 # Imports -----------------------------------------------------------------
 
 # Import pipe
@@ -31,114 +30,9 @@ use_pipe()
 
 # Import packages
 use_package("dplyr")
-use_package("magrittr")
-use_package("lubridate")
-use_package("stringr")
-use_package("readr")
-use_package("RCurl")
-use_package("rjson")
 use_package("data.table")
-
-
-# Function listCwacSites --------------------------------------------------
-
-# Add function
-use_r("listCwacSites")
-
-# test locally
-load_all()
-
-listCwacSites("Eastern Cape")
-
-# Add documentation
-# Add ROxygen skeleton manually
-document()
-
-check()
-
-# Add tests
-
-use_testthat()
-
-use_test()
-
-test()
-
-
-# Function getCwacSiteInfo --------------------------------------------------
-
-# Add function
-use_r("getCwacSiteInfo")
-
-# test locally
-load_all()
-
-getCwacSiteInfo(23312919)
-
-# Add documentation
-# Add ROxygen skeleton manually
-document()
-
-check()
-
-# Add tests
-
-use_testthat()
-
-use_test()
-
-test()
-
-
-# Function listCwacCards --------------------------------------------------
-
-# Add function
-use_r("listCwacCards")
-
-# test locally
-load_all()
-
-listCwacCards(32481810)
-
-# Add documentation
-# Add ROxygen skeleton manually
-document()
-
-check()
-
-# Add tests
-
-use_testthat()
-
-use_test()
-
-test()
-
-
-
-# Function getCwacSurvey --------------------------------------------------
-
-# Add function
-use_r("getCwacSurvey")
-
-# test locally
-load_all()
-
-getCwacSurvey(508082)
-
-# Add documentation
-# Add ROxygen skeleton manually
-document()
-
-check()
-
-# Add tests
-
-use_testthat()
-
-use_test()
-
-test()
+use_package("rjson")
+use_package("RCurl")
 
 
 # Function jsonToTibble --------------------------------------------------
@@ -165,15 +59,15 @@ use_test()
 test()
 
 
-# Function getDicctionary --------------------------------------------------
+# Function searchSabapSpecies --------------------------------------------------
 
 # Add function
-use_r("getCwacDictionary")
+use_r("searchSabapSpecies")
 
 # test locally
 load_all()
 
-getCwacDictionary()
+searchSabapSpecies("Duck")
 
 # Add documentation
 # Add ROxygen skeleton manually
@@ -189,30 +83,6 @@ use_test()
 
 test()
 
-
-# Function searchCwacTerm --------------------------------------------------
-
-# Add function
-use_r("searchCwacTerm")
-
-# test locally
-load_all()
-
-searchCwacTerm("Season")
-searchCwacTerm(option = "fields")
-# Add documentation
-# Add ROxygen skeleton manually
-document()
-
-check()
-
-# Add tests
-
-use_testthat()
-
-use_test()
-
-test()
 
 # Install -----------------------------------------------------------------
 
