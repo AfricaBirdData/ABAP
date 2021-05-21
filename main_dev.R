@@ -33,6 +33,7 @@ use_package("dplyr")
 use_package("data.table")
 use_package("rjson")
 use_package("RCurl")
+use_package("readr")
 
 
 # Function jsonToTibble --------------------------------------------------
@@ -93,6 +94,34 @@ use_r("getSabapData")
 load_all()
 
 getSabapData(123, region_type = "pentad", region = "2505_2850")
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
+
+
+# Function cleanSabapData --------------------------------------------------
+
+# BETA
+
+# Add function
+use_r("cleanSabapData")
+
+# test locally
+load_all()
+
+getSabapData(123, region_type = "pentad", region = "2505_2850") %>%
+  cleanSabapData()
 
 # Add documentation
 # Add ROxygen skeleton manually
