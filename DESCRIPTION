@@ -1,0 +1,18 @@
+Package: SABAP
+Title: Access to Southern Africa Bird Atlas Project data
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "BIRDIE",
+           family = "Development Team",
+           role = c("aut", "cre"),
+           email = "f.cervantesperalta@gmail.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package provides functions to access the SABAP server API and
+    download data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    magrittr
