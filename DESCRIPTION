@@ -21,3 +21,5 @@ Imports:
     RCurl,
     readr,
     rjson
+Depends: 
+    R (>= 2.10)

@@ -137,6 +137,16 @@ use_test()
 
 test()
 
+
+# Data pentads_sabap2 -------------------------------------------------------------
+
+# Prepare pentads
+# source("data_prep/barberspan_prep.R")
+
+# Create an ROxygen2 file and document
+document()
+
+
 # Install -----------------------------------------------------------------
 
 devtools::install()
