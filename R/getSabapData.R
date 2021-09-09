@@ -46,6 +46,11 @@ getSabapData <- function(.spp_code,
     utils::read.csv(header = TRUE) %>%
     dplyr::as_tibble()
 
+  # If there are multiple regions (e.g. multiple pentads), then multiple headers
+  # are produced and inserted as data. Eliminate these
+  out <- out %>%
+    dplyr::filter(Pentad != "Pentad")
+
   out <- out %>%
     readr::type_convert(col_types = readr::cols(
       .default = readr::col_integer(),
