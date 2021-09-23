@@ -146,6 +146,30 @@ test()
 # Create an ROxygen2 file and document
 document()
 
+# Function getRegionPentads --------------------------------------------------
+
+# Add function
+use_r("getRegionPentads")
+
+# test locally
+load_all()
+
+getRegionPentads(country = "South Africa", province = "North West")
+getRegionPentads(country = "South Africa", province = "North West", path = "analysis/data")
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
 
 # Install -----------------------------------------------------------------
 
