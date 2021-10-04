@@ -22,6 +22,11 @@ use_mit_license("BIRDIE Development Team")
 
 # Remember to edit the DESCRIPTION file
 
+# Create an Rmarkdown README
+usethis::use_readme_rmd()
+
+# Remember to run this line when README is modified
+use_readme_rmd()
 
 # Imports -----------------------------------------------------------------
 
