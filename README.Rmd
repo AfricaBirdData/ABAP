@@ -1,5 +1,17 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # SABAP
 
@@ -10,12 +22,12 @@ This packages provides functionality to access and download data from
 the Southern Africa Bird Atlas Project.
 
 A typical workflow entails defining a region and a species of interest,
-e.g. say we are interested in the occupancy of the African Black Duck in
+e.g. say we are interested in the occupancy of the African Black Duck in
 the North West province of South Africa:
 
 First find the SABAP2 code for the species:
 
-``` r
+```{r}
 library(SABAP)
 
 # We can search for all duck species
@@ -23,53 +35,42 @@ ducks <- searchSabapSpecies("Duck")
 
 # Then we can extract the code we are interested in
 ducks[ducks$Common_species == "African Black", "Spp"]
-#> # A tibble: 1 × 1
-#>   Spp  
-#>   <chr>
-#> 1 95
+
 ```
 
-With our code (95) we can download the data recorded for the region of
-interest:
 
-``` r
+With our code (95) we can download the data recorded for the region of interest:
+
+```{r}
 my_det_data <- getSabapData(.spp_code = 95, .region_type = "province", .region = "North West")
 ```
 
-Note the trailing dots in the argument names. This makes it easier to
-incorporate this function into other larger functions and workflows.
+Note the trailing dots in the argument names. This makes it easier to incorporate
+this function into other larger functions and workflows.
 
 We may be interested in detection data in a set of pentads that do not
-correspond to any particular region. Although getSabapData allows you to
-download data from any one pentad, it is not advised to use this
-functionality to loop over a set of pentads (unless it is a small set).
-this is because the algorithm will create a query for each pentad!
-Resulting in a very slow process. The easiest and fastest way to obtain
-these data is to download a larger region that contains our pentads and
-then filter only those we are interested in.
+correspond to any particular region. Although getSabapData allows you to download
+data from any one pentad, it is not advised to use this functionality to loop
+over a set of pentads (unless it is a small set). this is because the algorithm
+will create a query for each pentad! Resulting in a very slow process. The 
+easiest and fastest way to obtain these data is to download a larger region that
+contains our pentads and then filter only those we are interested in.
 
-SABAP comes with the pentads installed as data in
-[sf](https://r-spatial.github.io/sf/) format (POLYGON).
+SABAP comes with the pentads installed as data in [sf](https://r-spatial.github.io/sf/)
+format (POLYGON).
 
-``` r
+```{r}
 library(sf)
-#> Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1
 class(pentads_sabap)
-#> [1] "sf"         "data.frame"
 unique(st_geometry_type(pentads_sabap))
-#> [1] POLYGON
-#> 18 Levels: GEOMETRY POINT LINESTRING POLYGON MULTIPOINT ... TRIANGLE
 plot(st_geometry(pentads_sabap), lwd = 0.1)
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+For demonstration purposes let's subset ten random pentads in the North West 
+province using the data we just downloaded and download Black Duck data for them.
+This doesn't make any sense, but hopefully shows the point.
 
-For demonstration purposes let’s subset ten random pentads in the North
-West province using the data we just downloaded and download Black Duck
-data for them. This doesn’t make any sense, but hopefully shows the
-point.
-
-``` r
+```{r}
 set.seed(8476)
 
 pentads_sel <- unique(my_det_data$Pentad) %>% 
@@ -77,13 +78,13 @@ pentads_sel <- unique(my_det_data$Pentad) %>%
 
 # We can now subset those pentads from the original data
 det_data_sel <- my_det_data[my_det_data$Pentad %in% pentads_sel,]
+
 ```
 
-To illustrate the entire workflow with
-[dplyr](https://dplyr.tidyverse.org/), we will use the same selection of
-pentads.
+To illustrate the entire workflow with [dplyr](https://dplyr.tidyverse.org/), 
+we will use the same selection of pentads.
 
-``` r
+```{r}
 library(dplyr, warn.conflicts = FALSE)
 
 # Find species code
@@ -94,25 +95,30 @@ my_det_data <- searchSabapSpecies("Duck") %>%
   getSabapData(.region_type = "province", .region = "North West") %>% 
   # Filter pentads of interest  
   filter(Pentad %in% pentads_sel)
+
+
 ```
+
 
 ## INSTRUCTIONS TO INSTALL
 
-``` r
+```{r, eval=FALSE}
+
 # In the call below you must replace 'yourtoken' with your GitHub Personal Authorisation Token (PAT)
 remotes::install_github("AfricanBirdData/SABAP", type = "source", auth_token = 'yourtoken')
+
 ```
 
 ## INSTRUCTIONS TO CONTRIBUTE CODE
 
 First clone the repository to your local machine:
 
--   In RStudio, create a new project
--   In the ‘Create project’ menu, select ‘Version Control’/‘Git’
--   Copy the repository URL (click on the ‘Code’ green button and copy
-    the link)
--   Choose the appropriate directory and ‘Create project’
--   Remember to pull the latest version regularly
+- In RStudio, create a new project
+- In the ‘Create project’ menu, select ‘Version Control’/‘Git’
+- Copy the repository URL (click on the ‘Code’ green button and
+        copy the link)
+- Choose the appropriate directory and ‘Create project’
+- Remember to pull the latest version regularly
 
 For site owners:
 
@@ -141,8 +147,7 @@ lifespan. In steps:
     -   Either use the Git GUI (go to branches/delete/select
         branch/push).
     -   Or use the console typing ‘git branch -d your\_branch\_name’.
-    -   It might also be necessary to prune remote branches with ‘git
-        remote prune origin’.
+    -   It might also be necessary to prune remote branches with 'git remote prune origin'.
 
 Opening branches is quick and easy, so there is no harm in opening
 multiple branches a day. However, it is important to merge and delete

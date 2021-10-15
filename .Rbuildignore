@@ -3,3 +3,4 @@
 ^LICENSE\.md$
 main_dev.R
 beta/*
+^README\.Rmd$

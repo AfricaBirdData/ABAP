@@ -22,6 +22,11 @@ use_mit_license("BIRDIE Development Team")
 
 # Remember to edit the DESCRIPTION file
 
+# Create an Rmarkdown README
+usethis::use_readme_rmd()
+
+# Remember to run this line when README is modified
+use_readme_rmd()
 
 # Imports -----------------------------------------------------------------
 
@@ -146,6 +151,30 @@ test()
 # Create an ROxygen2 file and document
 document()
 
+# Function getRegionPentads --------------------------------------------------
+
+# Add function
+use_r("getRegionPentads")
+
+# test locally
+load_all()
+
+getRegionPentads(country = "South Africa", province = "North West")
+getRegionPentads(country = "South Africa", province = "North West", path = "analysis/data")
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
 
 # Install -----------------------------------------------------------------
 
