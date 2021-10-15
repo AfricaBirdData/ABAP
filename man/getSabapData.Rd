@@ -26,7 +26,7 @@ province or a pentad code.}
 \item{.years}{A numeric vector with elements corresponding to the years we
 want data for.}
 
-\item{.adhoc}{If TRUE, \emph{only} ad-hoc lists are returned. Defaults to FALSE.}
+\item{.adhoc}{If TRUE, \strong{only} ad-hoc lists are returned. Defaults to FALSE.}
 }
 \value{
 A tibble in which each row corresponds to one SABAP2 card. The column

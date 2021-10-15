@@ -9,7 +9,7 @@
 #' province or a pentad code.
 #' @param .years A numeric vector with elements corresponding to the years we
 #' want data for.
-#' @param .adhoc If TRUE, *only* ad-hoc lists are returned. Defaults to FALSE.
+#' @param .adhoc If TRUE, **only** ad-hoc lists are returned. Defaults to FALSE.
 #'
 #' @return A tibble in which each row corresponds to one SABAP2 card. The column
 #' 'Spp' gives either the code of the species of interest, if it was detected
