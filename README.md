@@ -96,19 +96,23 @@ my_det_data <- searchSabapSpecies("Duck") %>%
   filter(Pentad %in% pentads_sel)
 ```
 
-## INSTRUCTION TO INSTALL
+## INSTRUCTIONS TO INSTALL
 
-1.  Clone the repository to your local machine:
-    -   In RStudio, create a new project
-    -   In the ‘Create project’ menu, select ‘Version Control’/‘Git’
-    -   Copy the repository URL (click on the ‘Code’ green button and
-        copy the link)
-    -   Choose the appropiate directory and ‘Create project’
-2.  Install the package ‘devtools’ in case you don´t have it and run
-    devtools::install() from the project directory
-3.  Remember to pull the latest version regularly
+``` r
+# In the call below you must replace 'yourtoken' with your GitHub Personal Authorisation Token (PAT)
+remotes::install_github("AfricanBirdData/SABAP", type = "source", auth_token = 'yourtoken')
+```
 
 ## INSTRUCTIONS TO CONTRIBUTE CODE
+
+First clone the repository to your local machine:
+
+-   In RStudio, create a new project
+-   In the ‘Create project’ menu, select ‘Version Control’/‘Git’
+-   Copy the repository URL (click on the ‘Code’ green button and copy
+    the link)
+-   Choose the appropriate directory and ‘Create project’
+-   Remember to pull the latest version regularly
 
 For site owners:
 
@@ -137,6 +141,8 @@ lifespan. In steps:
     -   Either use the Git GUI (go to branches/delete/select
         branch/push).
     -   Or use the console typing ‘git branch -d your\_branch\_name’.
+    -   It might also be necessary to prune remote branches with ‘git
+        remote prune origin’.
 
 Opening branches is quick and easy, so there is no harm in opening
 multiple branches a day. However, it is important to merge and delete
