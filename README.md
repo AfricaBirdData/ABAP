@@ -22,10 +22,10 @@ library(SABAP)
 ducks <- searchSabapSpecies("Duck")
 
 # Then we can extract the code we are interested in
-ducks[ducks$Common_species == "African Black", "Spp"]
+ducks[ducks$Common_species == "African Black", "SAFRING_No"]
 #> # A tibble: 1 × 1
-#>   Spp  
-#>   <chr>
+#>   SAFRING_No
+#>   <chr>     
 #> 1 95
 ```
 
@@ -89,7 +89,7 @@ library(dplyr, warn.conflicts = FALSE)
 # Find species code
 my_det_data <- searchSabapSpecies("Duck") %>% 
   filter(Common_species == "African Black") %>% 
-  pull(Spp) %>% 
+  pull(SAFRING_No) %>% 
   # Download SABAP data for the whole North West province
   getSabapData(.region_type = "province", .region = "North West") %>% 
   # Filter pentads of interest  

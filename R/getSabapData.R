@@ -16,9 +16,9 @@
 #' @export
 #'
 #' @examples
-#' getSabapData(123, region_type = "country", region = "South Africa")
-#' getSabapData(169, region_type = "province", region = "Eastern Cape", years = 2008)
-#' getSabapData(95, region_type = "pentad", region = "2505_2850", years = c(2008, 2009))
+#' getSabapData(123, .region_type = "country", .region = "South Africa")
+#' getSabapData(169, .region_type = "province", .region = "Eastern Cape", .years = 2008)
+#' getSabapData(95, .region_type = "pentad", .region = "2505_2850", .years = c(2008, 2009))
 getSabapData <- function(.spp_code,
                          .region_type = c("country", "province", "pentad"),
                          .region, .years = NULL){
@@ -34,7 +34,7 @@ getSabapData <- function(.spp_code,
   .region <- tolower(.region)
   .region <- gsub(" ", "", .region)
 
-  url <- paste0("http://api.adu.org.za/sabap2/v2/cards/species/85ee37929696cba93e1cdda4dbb3f93a/", .spp_code, "/",
+  url <- paste0("http://api.birdmap.africa/sabap2/v2/cards/species/85ee37929696cba93e1cdda4dbb3f93a/", .spp_code, "/",
                 .region_type, "/", .region, "?format=csv&inclnull=1", .years)
 
   # Extract data

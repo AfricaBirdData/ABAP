@@ -7,10 +7,15 @@
 searchSabapSpecies(species)
 }
 \arguments{
-\item{species}{A character string with any part of the common or taxonomic name, or, the SABAP2 species code. Note that full names will not work; choose a single word.}
+\item{species}{A character string with any part of the common or taxonomic
+name, or, the SABAP2 species code (SAFRING code). Note that full names will
+not work; choose a single word.}
 }
 \value{
-A tibble with taxonomic information and SABAP2 codes of all species matching the search
+A tibble with taxonomic information and SABAP2 codes of all species
+matching the search. At the moment, if a species code is passed, the new API
+is used. For convenience functionality for entering a common name is
+maintained through the old API, but this might be discontinued.
 }
 \description{
 Search species in SABAP2 data base
