@@ -34,7 +34,7 @@ in that card, or "-" if it wasn't.
 Download data from SABAP2 cards for a region and species
 }
 \examples{
-getSabapData(123, region_type = "country", region = "South Africa")
-getSabapData(169, region_type = "province", region = "Eastern Cape", years = 2008)
-getSabapData(95, region_type = "pentad", region = "2505_2850", years = c(2008, 2009))
+getSabapData(123, .region_type = "country", .region = "South Africa")
+getSabapData(169, .region_type = "province", .region = "Eastern Cape", .years = 2008)
+getSabapData(95, .region_type = "pentad", .region = "2505_2850", .years = c(2008, 2009))
 }

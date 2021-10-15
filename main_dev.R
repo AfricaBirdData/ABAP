@@ -39,7 +39,8 @@ use_package("data.table")
 use_package("rjson")
 use_package("RCurl")
 use_package("readr")
-
+use_package("sf")
+use_package("raster") # for getRegionPentads only for now. Remove if pentads are annotated with regions.
 
 # Function jsonToTibble --------------------------------------------------
 
