@@ -9,6 +9,7 @@
 #' province or a pentad code.
 #' @param .years A numeric vector with elements corresponding to the years we
 #' want data for.
+#' @param .adhoc If TRUE, *only* ad-hoc lists are returned. Defaults to FALSE.
 #'
 #' @return A tibble in which each row corresponds to one SABAP2 card. The column
 #' 'Spp' gives either the code of the species of interest, if it was detected
@@ -21,7 +22,7 @@
 #' getSabapData(95, .region_type = "pentad", .region = "2505_2850", .years = c(2008, 2009))
 getSabapData <- function(.spp_code,
                          .region_type = c("country", "province", "pentad"),
-                         .region, .years = NULL){
+                         .region, .years = NULL, .adhoc = FALSE){
 
   if(is.null(.region_type)){
     .region_type <- "country"
@@ -36,6 +37,10 @@ getSabapData <- function(.spp_code,
 
   url <- paste0("http://api.birdmap.africa/sabap2/v2/cards/species/85ee37929696cba93e1cdda4dbb3f93a/", .spp_code, "/",
                 .region_type, "/", .region, "?format=csv&inclnull=1", .years)
+
+  if(.adhoc){
+    url <- paste0(url, "&adhoc=1")
+  }
 
   # Extract data
   myfile <- RCurl::getURL(url, ssl.verifyhost = FALSE, ssl.verifypeer = FALSE)
