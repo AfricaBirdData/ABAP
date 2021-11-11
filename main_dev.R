@@ -223,6 +223,27 @@ use_test()
 test()
 
 
+# Function addVarFromEEclosestImage --------------------------------------------
+
+# Add function
+use_r("addVarFromEEclosestImage")
+
+# test locally
+load_all()
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
 
 # Install -----------------------------------------------------------------
 
