@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-addVarFromEEimage <- function(ee_pentads, image, reducer,
+addVarEEimage <- function(ee_pentads, image, reducer,
                               bands = NULL, unmask = FALSE){
 
   # Get image

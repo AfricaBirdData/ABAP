@@ -24,7 +24,7 @@
 #' @export
 #'
 #' @examples
-addVarFromEEcollection <- function(ee_pentads, collection, dates,
+addVarEEcollection <- function(ee_pentads, collection, dates,
                                    temp_reducer, spt_reducer,
                                    bands = NULL, unmask = FALSE){
 

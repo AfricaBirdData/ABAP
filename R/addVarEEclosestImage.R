@@ -26,7 +26,7 @@
 #' @export
 #'
 #' @examples
-addVarFromEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
+addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
                                      bands = NULL, unmask = FALSE){
 
   # Get image
