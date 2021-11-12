@@ -2,8 +2,9 @@
 #'
 #' @param ee_pentads A feature collection with the pentads we want to annotate.
 #' We need to upload an sf object with the pentads to GEE.
-#' @param collection The name of the collection we want to use. See
-#' \href{https://developers.google.com/earth-engine/datasets/catalog}{GEE catalog}.
+#' @param collection Either a character string with the name of the collection
+#' we want to use or a GEE collection produced with \code{ee$ImageCollection()}.
+#' See \href{https://developers.google.com/earth-engine/datasets/catalog}{GEE catalog}.
 #' @dates A character vector with two elements c(start, end). Format must be
 #' "yyyy-mm-dd".
 #' @param temp_reducer A character string specifying the function to summarize
@@ -25,12 +26,19 @@
 #'
 #' @examples
 addVarEEcollection <- function(ee_pentads, collection, dates,
-                                   temp_reducer, spt_reducer,
-                                   bands = NULL, unmask = FALSE){
+                               temp_reducer, spt_reducer,
+                               bands = NULL, unmask = FALSE){
 
   # Get image
-  ee_layer <- ee$ImageCollection(collection)$
-    filterDate(dates[1], dates[2])
+  if(is.character(collection)){
+    ee_layer <- ee$ImageCollection(collection)$
+      filterDate(dates[1], dates[2])
+  } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
+    ee_layer <- collection$
+      filterDate(dates[1], dates[2])
+  } else {
+    stop("collection must be either a character string or a GEE image collection")
+  }
 
   # Get nominal scale for the layer (native resolution) and projection
   scale <- ee_layer$first()$projection()$nominalScale()$getInfo()

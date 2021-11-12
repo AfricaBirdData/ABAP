@@ -2,7 +2,8 @@
 #'
 #' @param ee_pentads A feature collection with the pentads we want to annotate.
 #' We need to upload an sf object with the pentads to GEE.
-#' @param image The name of the image we want to use. See
+#' @param image Either a character string with the name of the image we want to
+#' use or an GEE image produced with \code{ee$Image()}. See
 #' \href{https://developers.google.com/earth-engine/datasets/catalog}{GEE catalog}.
 #' @param reducer A character string specifying the function apply when
 #' extracting values for each pentad. It is common to use "mean", "sum" or
@@ -22,7 +23,13 @@ addVarEEimage <- function(ee_pentads, image, reducer,
                               bands = NULL, unmask = FALSE){
 
   # Get image
-  ee_layer <- ee$Image(image)
+  if(is.character(image)){
+    ee_layer <- ee$Image(image)
+  } else if("ee.image.Image" %in% class(image)){
+    ee_layer <- image
+  } else {
+    stop("image must be either a character string or a GEE image")
+  }
 
   # Subset bands
   if(!is.null(bands)){

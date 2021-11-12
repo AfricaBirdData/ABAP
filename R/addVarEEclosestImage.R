@@ -8,12 +8,13 @@
 #' also have character column with the dates that need to be matched against the
 #' image collection dates. The format must be "yyyy-mm-dd" and the column must
 #' be named "Date".
-#' #' @param reducer A character string specifying the function apply when
+#' @param collection Either a character string with the name of the collection
+#' we want to use or a GEE collection produced with \code{ee$ImageCollection()}.
+#' See \href{https://developers.google.com/earth-engine/datasets/catalog}{GEE catalog}.
+#' @param reducer A character string specifying the function apply when
 #' extracting values for each pentad. It is common to use "mean", "sum" or
 #' "count". But there are many other, see 'ee.Reducer' under Client Libraries at
 #' \url{https://developers.google.com/earth-engine/apidocs}.
-#' @param collection The name of the collection we want to use. See
-#' \href{https://developers.google.com/earth-engine/datasets/catalog}{GEE catalog}.
 #' @maxdiff Maximum difference in days allowed for an image to be matched with
 #' data.
 #' @param bands Select specific bands from the image. Only one band at a time is
@@ -27,10 +28,17 @@
 #'
 #' @examples
 addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
-                                     bands = NULL, unmask = FALSE){
+                                 bands = NULL, unmask = FALSE){
 
   # Get image
-  ee_layer <- ee$ImageCollection(collection)
+  if(is.character(collection)){
+    ee_layer <- ee$ImageCollection(collection)
+  } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
+    ee_layer <- collection
+  } else {
+    stop("collection must be either a character string or a GEE image collection")
+  }
+
 
   # Get nominal scale for the layer (native resolution) and projection
   scale <- ee_layer$first()$projection()$nominalScale()$getInfo()
