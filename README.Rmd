@@ -176,6 +176,10 @@ uploaded from an `sf` object. For example to upload all SABAP pentads (remember
 that these are already on an `sf` format!), we can use:
 
 ```{r eval=FALSE}
+library(SABAP)
+library(sf)
+library(dplyr, warn.conflicts = FALSE)
+
 # Load SABAP pentads
 pentads <- SABAP::pentads_sabap
 
@@ -213,11 +217,6 @@ Finally, images have pixels but our spatial objects are polygons, so we need to
 define some type of summarizing function. The same thing that `raster::extract()`
 would need. In GEE this is called a "reducer". In this case, we will select the
 mean (i.e., mean water occurrence per pixel within each pentad).
-
-```{r eval=FALSE}
-assetId <- sprintf("%s/%s", ee_get_assethome(), 'pentads')
-ee_pentads <- ee$FeatureCollection(assetId)
-```
 
 
 ```{r eval=FALSE}
@@ -271,7 +270,6 @@ As an example, let's download SABAP2 data for the Maccoa Duck in 2010 and
 annotate these data with TerraClimate's minimum temperature data.
 
 ```{r eval=FALSE}
-library(dplyr)
 
 # Load SABAP pentads
 pentads <- SABAP::pentads_sabap

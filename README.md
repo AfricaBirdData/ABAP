@@ -179,6 +179,10 @@ example to upload all SABAP pentads (remember that these are already on
 an `sf` format!), we can use:
 
 ``` r
+library(SABAP)
+library(sf)
+library(dplyr, warn.conflicts = FALSE)
+
 # Load SABAP pentads
 pentads <- SABAP::pentads_sabap
 
@@ -220,11 +224,6 @@ need to define some type of summarizing function. The same thing that
 `raster::extract()` would need. In GEE this is called a “reducer”. In
 this case, we will select the mean (i.e., mean water occurrence per
 pixel within each pentad).
-
-``` r
-assetId <- sprintf("%s/%s", ee_get_assethome(), 'pentads')
-ee_pentads <- ee$FeatureCollection(assetId)
-```
 
 ``` r
 pentads_water <- addVarEEimage(ee_pentads = ee_pentads,                   # Note that we need our remote asset here
@@ -279,8 +278,6 @@ As an example, let’s download SABAP2 data for the Maccoa Duck in 2010
 and annotate these data with TerraClimate’s minimum temperature data.
 
 ``` r
-library(dplyr)
-
 # Load SABAP pentads
 pentads <- SABAP::pentads_sabap
 
