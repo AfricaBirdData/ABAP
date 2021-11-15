@@ -41,6 +41,7 @@ use_package("RCurl")
 use_package("readr")
 use_package("sf")
 use_package("raster") # for getRegionPentads only for now. Remove if pentads are annotated with regions.
+use_package("rgee")
 
 # Function jsonToTibble --------------------------------------------------
 
@@ -162,6 +163,73 @@ load_all()
 
 getRegionPentads(country = "South Africa", province = "North West")
 getRegionPentads(country = "South Africa", province = "North West", path = "analysis/data")
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
+
+# Function addVarFromEEimage --------------------------------------------------
+
+# Add function
+use_r("addVarFromEEimage")
+
+# test locally
+load_all()
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
+
+# Function addVarFromEEcollection --------------------------------------------------
+
+# Add function
+use_r("addVarFromEEcollection")
+
+# test locally
+load_all()
+
+# Add documentation
+# Add ROxygen skeleton manually
+document()
+
+check()
+
+# Add tests
+
+use_testthat()
+
+use_test()
+
+test()
+
+
+# Function addVarFromEEclosestImage --------------------------------------------
+
+# Add function
+use_r("addVarFromEEclosestImage")
+
+# test locally
+load_all()
 
 # Add documentation
 # Add ROxygen skeleton manually
