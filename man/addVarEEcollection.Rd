@@ -22,6 +22,9 @@ We need to upload an sf object with the pentads to GEE.}
 we want to use or a GEE collection produced with \code{ee$ImageCollection()}.
 See \href{https://developers.google.com/earth-engine/datasets/catalog}{GEE catalog}.}
 
+\item{dates}{A character vector with two elements c(start, end). Format must be
+"yyyy-mm-dd".}
+
 \item{temp_reducer}{A character string specifying the function to summarize
 collection across time. It is common to use "mean", "sum" or "count", but
 there are many others, see 'ee.Reducer' under Client Libraries at

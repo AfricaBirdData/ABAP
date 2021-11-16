@@ -15,7 +15,7 @@
 #' extracting values for each pentad. It is common to use "mean", "sum" or
 #' "count". But there are many other, see 'ee.Reducer' under Client Libraries at
 #' \url{https://developers.google.com/earth-engine/apidocs}.
-#' @maxdiff Maximum difference in days allowed for an image to be matched with
+#' @param maxdiff Maximum difference in days allowed for an image to be matched with
 #' data.
 #' @param bands Select specific bands from the image. Only one band at a time is
 #' allowed for now.
