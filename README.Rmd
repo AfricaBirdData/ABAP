@@ -18,6 +18,11 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
+This packages provides functionality to access and download data from
+the Southern Africa Bird Atlas Project. Most of its functionality is experimental
+(especially that using Google Earth Engine) and under development, so use with
+caution and please send any feedback!
+
 ## INSTRUCTIONS TO INSTALL
 
 ```{r, eval=FALSE}
@@ -28,9 +33,6 @@ remotes::install_github("AfricanBirdData/SABAP", type = "source", auth_token = '
 ```
 
 ## DOWNLOAD SABAP DATA
-
-This packages provides functionality to access and download data from
-the Southern Africa Bird Atlas Project.
 
 A typical workflow entails defining a region and a species of interest,
 e.g. say we are interested in the occupancy of the African Black Duck in
@@ -320,6 +322,34 @@ visit_new <- addVarEEclosestImage(ee_pentads = ee_visit,
 
 ```
 
+### Convert image collection to a multi-band image
+
+Lastly, we have made a convenience function that converts an image collection
+into a multi-band image. This is useful because you can only annotate one
+image at a time, but all the bands in the image get annotated. So if you want to
+add several variables to your data, you can first create a multi-band image and 
+then annotate with all at once. This way you minimize the traffic between your
+machine and GEE servers saving precious time and bandwidth.
+
+Here we show how to find the mean NDVI for each year between 2008 and 2010, and
+with this find the mean NDVI per pentad.
+
+```{r eval=FALSE}
+
+# Create a multi-band image with mean NDVI for each year
+multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
+                                           dates = c("2008-01-01", "2020-01-01"),
+                                           band = "NDVI",                       # You can find what bands are available from GEE catalog
+                                           group_type = "year",
+                                           groups = 2008:2019,
+                                           reducer = "mean",
+                                           unmask = FALSE)
+
+# Find mean (mean) NDVI for each pentad and year
+pentads_ndvi <- addVarEEimage(ee_pentads, multiband, "mean")
+
+```
+
 
 ## INSTRUCTIONS TO CONTRIBUTE CODE
 
@@ -348,13 +378,13 @@ lifespan. In steps:
 -   Push to the remote repo
 -   Make your changes in your local machine
 -   Commit and push to remote
--   Merge your changes:
+-   Create pull request:
     -   In the GitHub repo you will now see an option that notifies of
         changes in a branch: click compare and pull request.
-    -   If there are no conflicts ‘merge pull request’
--   Delete the branch. You will have to delete it in the remote repo
-    (GitHub) and also in your local machine. In your local machine you
-    have to use Git directly, apparently RStudio doesn´t do it:
+-   Delete the branch. When you are finished, you will have to delete the new
+    branch in the remote repo (GitHub) and also in your local machine. In your
+    local machine you have to use Git directly, because apparently RStudio 
+    doesn´t do it:
     -   In your local machine, change to master branch.
     -   Either use the Git GUI (go to branches/delete/select
         branch/push).
