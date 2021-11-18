@@ -4,7 +4,15 @@
 \alias{EEcollectionToMultiband}
 \title{Convert a GEE collection to multiband image}
 \usage{
-EEcollectionToMultiband(collection, dates, band, group_type, groups, reducer)
+EEcollectionToMultiband(
+  collection,
+  dates,
+  band,
+  group_type,
+  groups,
+  reducer = NULL,
+  unmask = FALSE
+)
 }
 \arguments{
 \item{collection}{Either a character string with the name of the collection
@@ -23,7 +31,13 @@ temporal grouping, either: 'day', 'week', 'month', or 'year'.}
 \item{groups}{An integer vector with values for the group. e.g.
 \code{2008:2019} will group data into years from 2008 to 2019.}
 
-\item{reducer}{The summarizing function applied to each group.}
+\item{reducer}{The summarizing function applied to each group. If reducer is
+NULL, then the collection is transformed into a multiband image without
+applying any reduction (each image goes to a band).}
+
+\item{unmask}{GEE masks missing values, which means they are not used for
+computing means, counts, etc. Sometimes we might want to avoid this behaviour
+and use 0 instead of NA. If so, set unmask to TRUE.}
 }
 \value{
 

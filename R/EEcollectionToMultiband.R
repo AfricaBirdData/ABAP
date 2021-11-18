@@ -11,13 +11,21 @@
 #' temporal grouping, either: 'day', 'week', 'month', or 'year'.
 #' @param groups An integer vector with values for the group. e.g.
 #' \code{2008:2019} will group data into years from 2008 to 2019.
-#' @param reducer The summarizing function applied to each group.
+#' @param reducer The summarizing function applied to each group. If reducer is
+#' NULL, then the collection is transformed into a multiband image without
+#' applying any reduction (each image goes to a band).
+#' @param unmask GEE masks missing values, which means they are not used for
+#' computing means, counts, etc. Sometimes we might want to avoid this behaviour
+#' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-EEcollectionToMultiband <- function(collection, dates, band, group_type, groups, reducer){
+EEcollectionToMultiband <- function(collection, dates, band,
+                                    group_type, groups,
+                                    reducer = NULL,
+                                    unmask = FALSE){
 
   # Get image
   if(is.character(collection)){
@@ -35,6 +43,17 @@ EEcollectionToMultiband <- function(collection, dates, band, group_type, groups,
   # Get nominal scale for the layer (native resolution) and projection
   ee_proj <- ee$Projection(ee_layer$first()$projection())
 
+  # Remove missing values (this will depend on the layer)
+  if(unmask){
+    ee_layer <- ee_layer$map(
+        ee_utils_pyfunc(
+          function(image){
+            return(image$unmask())
+          }))
+  }
+
+  if(!is.null(reducer)){
+
   # Create a list of groups
   ee_groups <-  ee$List(groups)
 
@@ -48,6 +67,12 @@ EEcollectionToMultiband <- function(collection, dates, band, group_type, groups,
         function(m){
           return(eval(parse(text = filter)))
         })))
+
+  } else {
+
+    byGroup <- ee_layer
+
+  }
 
   # Transform into a multiband image and reproject
   stackCollection <- byGroup$toBands()$rename(as.character(groups))$
