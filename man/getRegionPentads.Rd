@@ -4,29 +4,24 @@
 \alias{getRegionPentads}
 \title{Get SABAP2 pentads for a certain region}
 \usage{
-getRegionPentads(.country, .province = NULL, .path = NULL)
+getRegionPentads(.region_type, .region)
 }
 \arguments{
-\item{.country}{A character string with the name of the country the region of
-interest is at. Capitalize first letters of each word.}
+\item{.region_type}{The type of region we are interested on.
+Three options: "country", "province", "project" and "pentad".}
 
-\item{.province}{A character string. If provided it subsets the region of
-interest to a specific province. Capitalize first letters of each word.}
-
-\item{.path}{A directory where administrative boundaries layer should be found
-or stored at.}
+\item{.region}{A character string corresponding to the specific region we are
+interested in. It can be either a country in Southern Africa, a South African
+province, a project ("SABAP1" or "SABAP2") or a pentad code.}
 }
 \value{
 A simple feature object with those pentads that are contained in the
 region of interest. A pentads is considered contained if half of its area
-lies within the region. Note that the function uses raster::getData function,
-which will download the administrative boundaries data once per session.
-Alternatively, you may provide a path where this info will be stored and
-retrieved from permanently.
+lies within the region.
 }
 \description{
 Get SABAP2 pentads for a certain region
 }
 \examples{
-# getRegionPentads(country = "South Africa", province = "North West")
+# getRegionPentads(.region_type = "country", .region = "South Africa")
 }
