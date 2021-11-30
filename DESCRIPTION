@@ -1,6 +1,6 @@
 Package: SABAP
 Title: Access to Southern Africa Bird Atlas Project data
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person(given = "BIRDIE",
            family = "Development Team",
