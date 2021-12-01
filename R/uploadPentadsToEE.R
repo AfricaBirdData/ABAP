@@ -2,7 +2,7 @@
 #'
 #' @param pentads An \href{https://github.com/r-spatial/sf}{sf} object with the pentads to upload
 #' @param asset_id A character string with the name we want our pentads to be
-#' saved on the server
+#' saved on the server with.
 #' @param load If TRUE (default), the GEE asset is loaded into the R session.
 #' @param max_p Maximum number of pentads the function will try to upload
 #' without splitting into pieces. The default is a sensible choice but you can
