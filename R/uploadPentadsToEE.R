@@ -42,7 +42,6 @@
 uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
 
   nfeats <- nrow(pentads)
-  eename <- sprintf("%s/%s", ee_get_assethome(), asset_id)
 
   # Upload pentads
 
@@ -69,20 +68,20 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
 
     task <- rgee::ee_table_to_asset(collection = out,
                                     description = "SABAP merged pentads",
-                                    assetId = eename,
+                                    assetId = asset_id,
                                     overwrite = TRUE)
     task$start()
 
   } else {                              # For small objects
 
     sf_as_ee(pentads,
-             assetId = eename,
+             assetId = asset_id,
              via = "getInfo_to_asset")
   }
 
   # Load if required
   if(load){
-    out <- ee$FeatureCollection(eename)
+    out <- ee$FeatureCollection(asset_id)
     return(out)
   }
 
