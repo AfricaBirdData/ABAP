@@ -13,9 +13,11 @@ development, so use with caution and please send any feedback!
 
 ## INSTRUCTIONS TO INSTALL
 
+To install from GitHub using the
+[remotes](https://github.com/r-lib/remotes) package, run:
+
 ``` r
-# In the call below you must replace 'yourtoken' with your GitHub Personal Authorisation Token (PAT)
-remotes::install_github("AfricanBirdData/SABAP", type = "source", auth_token = 'yourtoken')
+remotes::install_github("AfricanBirdData/SABAP")
 ```
 
 ## DOWNLOAD SABAP DATA

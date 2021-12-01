@@ -25,10 +25,10 @@ caution and please send any feedback!
 
 ## INSTRUCTIONS TO INSTALL
 
+To install from GitHub using the [remotes](https://github.com/r-lib/remotes) package, run:
+
 ```{r, eval=FALSE}
-
 remotes::install_github("AfricanBirdData/SABAP")
-
 ```
 
 ## DOWNLOAD SABAP DATA
