@@ -27,8 +27,7 @@ caution and please send any feedback!
 
 ```{r, eval=FALSE}
 
-# In the call below you must replace 'yourtoken' with your GitHub Personal Authorisation Token (PAT)
-remotes::install_github("AfricanBirdData/SABAP", type = "source", auth_token = 'yourtoken')
+remotes::install_github("AfricanBirdData/SABAP")
 
 ```
 
