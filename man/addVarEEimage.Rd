@@ -32,3 +32,15 @@ and use 0 instead of NA. If so, set unmask to TRUE.}
 \description{
 Add variable from Google Earth Engine Image
 }
+\examples{
+\dontrun{
+# Load the remote data asset
+ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+
+# Annotate with surface water occurrence image
+pentads_tmmn <- addVarEEcollection(ee_pentads = ee_data,
+                                   image = "JRC/GSW1_3/GlobalSurfaceWater",
+                                   reducer = "mean",
+                                   bands = "occurrence")
+}
+}

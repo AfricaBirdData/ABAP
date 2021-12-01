@@ -26,6 +26,9 @@ getRegionPentads <- function(.region_type, .region){
     pentads <- sf::read_sf(url)
 
     # Clean and return
+    pentads <- pentads %>%
+        dplyr::rename_with(.fn = ~gsub(".", "_", .x, fixed = TRUE)) # remove points in names (GEE doesn't like)
+
     if(!is.null(pentads$format)){
         pentads <- pentads %>%
             dplyr::select(-format)

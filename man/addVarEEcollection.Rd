@@ -48,3 +48,17 @@ and use 0 instead of NA. If so, set unmask to TRUE.}
 \description{
 Add variable from Google Earth Engine Collection
 }
+\examples{
+\dontrun{
+# Load the remote data asset
+ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+
+# Annotate with TerraClimate dataset
+pentads_tmmn <- addVarEEcollection(ee_pentads = ee_data,
+                                   collection = "IDAHO_EPSCOR/TERRACLIMATE",
+                                   dates = c("2010-01-01", "2011-01-01"),
+                                   temp_reducer = "mean",
+                                   spt_reducer = "mean",
+                                   bands = "tmmn")
+}
+}

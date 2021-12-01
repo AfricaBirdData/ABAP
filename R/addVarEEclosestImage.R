@@ -27,6 +27,17 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Load the remote data asset
+#' ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+#'
+#' # Annotate with TerraClimate dataset
+#' visit_new <- addVarEEclosestImage(ee_pentads = ee_data,
+#'                                   collection = "IDAHO_EPSCOR/TERRACLIMATE",
+#'                                   reducer = "mean",                          # We only need spatial reducer
+#'                                   maxdiff = 15,                              # This is the maximum time difference that GEE checks
+#'                                   bands = c("tmmn"))
+#' }
 addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
                                  bands = NULL, unmask = FALSE){
 

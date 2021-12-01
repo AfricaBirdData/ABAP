@@ -57,15 +57,6 @@ Resulting in a very slow process. The easiest and fastest way to obtain
 these data is to download a larger region that contains our pentads and
 then filter only those we are interested in.
 
-SABAP comes with the pentads installed as data in
-[sf](https://r-spatial.github.io/sf/) format (POLYGON).
-
-``` r
-class(pentads_sabap)
-unique(st_geometry_type(pentads_sabap))
-plot(st_geometry(pentads_sabap), lwd = 0.1)
-```
-
 For demonstration purposes let’s subset ten random pentads in the North
 West province using the data we just downloaded and download Black Duck
 data for them. This doesn’t make any sense, but hopefully shows the
@@ -94,6 +85,14 @@ my_det_data <- searchSabapSpecies("Duck") %>%
   getSabapData(.region_type = "province", .region = "North West") %>% 
   # Filter pentads of interest  
   filter(Pentad %in% pentads_sel)
+```
+
+Finally, one can download SABAP pentads of a region of interest in
+[sf](https://r-spatial.github.io/sf/) format (POLYGON).
+
+``` r
+mypentads <- getRegionPentads(.region_type = "province",
+                              .region = "North West")
 ```
 
 ## ANNOTATE WITH GOOGLE EARTH ENGINE
@@ -186,15 +185,15 @@ library(sf)
 library(dplyr, warn.conflicts = FALSE)
 
 # Load SABAP pentads
-pentads <- SABAP::pentads_sabap
+pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 
 # Set an ID for your remote asset (data in GEE)
 assetId <- sprintf("%s/%s", ee_get_assethome(), 'pentads')
 
 # Upload to GEE (if not done already - do this only once)
-pentads %>%
-  sf_as_ee(assetId = assetId,
-           via = "getInfo_to_asset")
+uploadPentadsToEE(pentads = pentads,
+                  asset_id = assetId,
+                  load = FALSE)
 
 # Load the remote asset to you local computer to work with it
 ee_pentads <- ee$FeatureCollection(assetId)
@@ -281,41 +280,41 @@ and annotate these data with TerraClimate’s minimum temperature data.
 
 ``` r
 # Load SABAP pentads
-pentads <- SABAP::pentads_sabap
+pentads <- getRegionPentads(.region_type = "country", .region = "South Africa")
 
 # Download Maccoa Duck
-id <- SABAP::searchSabapSpecies("Duck") %>% 
+id <- searchSabapSpecies("Duck") %>% 
   filter(Common_species == "Maccoa") %>% 
   pull(SAFRING_No)
 
-visit <- SABAP::getSabapData(.spp_code = id,
-                             .region_type = "country",
-                             .region = "South Africa",
-                             .years = 2008)
+visit <- getSabapData(.spp_code = id,
+                      .region_type = "country",
+                      .region = "South Africa",
+                      .years = 2008)
 
 # Make spatial object
 visit <- visit %>% 
-   left_join(pentads, by = c("Pentad" = "Name")) %>% 
-   st_sf() %>% 
-   filter(!st_is_empty(.))   # Remove rows without geometry
+  left_join(pentads, by = c("Pentad" = "Name")) %>% 
+  st_sf() %>% 
+  filter(!st_is_empty(.))   # Remove rows without geometry
 
 # NOTE: TerraClimate offers monthly data. The date of each image is the beginning of
 # the month, which means that dates after the 15th will be matched against the
 # next month. I will change all dates to be on the first of the month for the
 # analysis
 visit <- visit %>% 
-   dplyr::select(CardNo, StartDate, Pentad, TotalHours, Spp) %>% 
-   mutate(Date = lubridate::floor_date(StartDate, "month"))
+  dplyr::select(CardNo, StartDate, Pentad, TotalHours, Spp) %>% 
+  mutate(Date = lubridate::floor_date(StartDate, "month"))
 
 # Load to EE (if not done already)
 assetId <- sprintf("%s/%s", ee_get_assethome(), 'visit2008')
 
 # Format date and upload to GEE
 visit %>%
-      dplyr::select(CardNo, Pentad, Date) %>%
-      mutate(Date = as.character(Date)) %>%   # GEE doesn't like dates
-      sf_as_ee(assetId = assetId,
-               via = "getInfo_to_asset")
+  dplyr::select(CardNo, Pentad, Date) %>%
+  mutate(Date = as.character(Date)) %>%   # GEE doesn't like dates
+  sf_as_ee(assetId = assetId,
+           via = "getInfo_to_asset")
 
 # Load the remote data asset
 ee_visit <- ee$FeatureCollection(assetId)

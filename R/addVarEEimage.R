@@ -19,6 +19,16 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # Load the remote data asset
+#' ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+#'
+#'# Annotate with surface water occurrence image
+#' pentads_tmmn <- addVarEEcollection(ee_pentads = ee_data,
+#'                                    image = "JRC/GSW1_3/GlobalSurfaceWater",
+#'                                    reducer = "mean",
+#'                                    bands = "occurrence")
+#' }
 addVarEEimage <- function(ee_pentads, image, reducer,
                               bands = NULL, unmask = FALSE){
 

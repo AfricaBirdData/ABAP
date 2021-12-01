@@ -45,3 +45,15 @@ and use 0 instead of NA. If so, set unmask to TRUE.}
 \description{
 Convert a GEE collection to multiband image
 }
+\examples{
+\dontrun{
+# Create a multi-band image with mean NDVI for each year
+multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
+                                     dates = c("2008-01-01", "2020-01-01"),
+                                     band = "NDVI",                       # You can find what bands are available from GEE catalog
+                                     group_type = "year",
+                                     groups = 2008:2019,
+                                     reducer = "mean",
+                                     unmask = FALSE)
+}
+}

@@ -18,7 +18,6 @@ Imports:
     data.table,
     dplyr,
     magrittr,
-    raster,
     RCurl,
     readr,
     rgee,
