@@ -20,7 +20,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Load SABAP pentads
+#' # Load ABAP pentads
 #' pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 #'
 #' # Set an ID for your remote asset (data in GEE)
@@ -67,7 +67,7 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
     out <- eep1$merge(eep2)
 
     task <- rgee::ee_table_to_asset(collection = out,
-                                    description = "SABAP merged pentads",
+                                    description = "ABAP merged pentads",
                                     assetId = asset_id,
                                     overwrite = TRUE)
     task$start()

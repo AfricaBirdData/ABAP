@@ -1,10 +1,10 @@
-#' Get SABAP2 pentads for a certain region
+#' Get ABAP pentads for a certain region
 #'
 #' @param .region_type The type of region we are interested on.
 #' Three options: "country", "province", "project" and "pentad".
 #' @param .region A character string corresponding to the specific region we are
 #' interested in. It can be either a country in Southern Africa, a South African
-#' province, a project ("SABAP1" or "SABAP2") or a pentad code.
+#' province, a project (currently, "SABAP1" or "SABAP2") or a pentad code.
 #'
 #' @return A simple feature object with those pentads that are contained in the
 #' region of interest. A pentads is considered contained if half of its area

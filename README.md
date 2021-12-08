@@ -1,15 +1,16 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# SABAP
+# ABAP
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-This packages provides functionality to access and download data from
-the Southern Africa Bird Atlas Project. Most of its functionality is
-experimental (especially that using Google Earth Engine) and under
-development, so use with caution and please send any feedback!
+This packages provides functionality to access, download, and manipulate
+data from the [African Bird Atlas Project](http://www.birdmap.africa/).
+Most of its functionality is experimental (especially that using Google
+Earth Engine) and under development, so use with caution and please send
+any feedback!
 
 ## INSTRUCTIONS TO INSTALL
 
@@ -17,24 +18,24 @@ To install from GitHub using the
 [remotes](https://github.com/r-lib/remotes) package, run:
 
 ``` r
-remotes::install_github("AfricanBirdData/SABAP")
+remotes::install_github("AfricanBirdData/ABAP")
 ```
 
-## DOWNLOAD SABAP DATA
+## DOWNLOAD ABAP DATA
 
 A typical workflow entails defining a region and a species of interest,
 e.g. say we are interested in the occupancy of the African Black Duck in
 the North West province of South Africa:
 
-First find the SABAP2 code for the species:
+First find the ABAP code for the species:
 
 ``` r
-library(SABAP)
+library(ABAP)
 library(sf)
 library(dplyr, warn.conflicts = FALSE)
 
 # We can search for all duck species
-ducks <- searchSabapSpecies("Duck")
+ducks <- searchAbapSpecies("Duck")
 
 # Then we can extract the code we are interested in
 ducks[ducks$Common_species == "African Black", "SAFRING_No"]
@@ -44,14 +45,14 @@ With our code (95) we can download the data recorded for the region of
 interest:
 
 ``` r
-my_det_data <- getSabapData(.spp_code = 95, .region_type = "province", .region = "North West")
+my_det_data <- getAbapData(.spp_code = 95, .region_type = "province", .region = "North West")
 ```
 
 Note the trailing dots in the argument names. This makes it easier to
 incorporate this function into other larger functions and workflows.
 
 We may be interested in detection data in a set of pentads that do not
-correspond to any particular region. Although getSabapData allows you to
+correspond to any particular region. Although getAbapData allows you to
 download data from any one pentad, it is not advised to use this
 functionality to loop over a set of pentads (unless it is a small set).
 this is because the algorithm will create a query for each pentad!
@@ -80,16 +81,16 @@ pentads.
 
 ``` r
 # Find species code
-my_det_data <- searchSabapSpecies("Duck") %>% 
+my_det_data <- searchAbapSpecies("Duck") %>% 
   filter(Common_species == "African Black") %>% 
   pull(SAFRING_No) %>% 
-  # Download SABAP data for the whole North West province
-  getSabapData(.region_type = "province", .region = "North West") %>% 
+  # Download ABAP data for the whole North West province
+  getAbapData(.region_type = "province", .region = "North West") %>% 
   # Filter pentads of interest  
   filter(Pentad %in% pentads_sel)
 ```
 
-Finally, one can download SABAP pentads of a region of interest in
+Finally, one can download ABAP pentads of a region of interest in
 [sf](https://r-spatial.github.io/sf/) format (POLYGON).
 
 ``` r
@@ -103,7 +104,7 @@ mypentads <- getRegionPentads(.region_type = "province",
 
 We have added some basic functionality to annotate pentads with
 environmental data from Google Earth Engine (GEE). This should make the
-analysis of SABAP data easier and more reproducible. This functionality
+analysis of ABAP data easier and more reproducible. This functionality
 uses the package `rgee`, which translates R code into Python code using
 `reticulate`, and allows us to use the GEE Python client libraries from
 R! You can find extensive documentation about `rgee`
@@ -176,17 +177,17 @@ These data will go to your assets directory in GEE server and it will
 stay there until you remove it. So if you have uploaded some data, you
 don’t have to upload it again. You typically want to make some spatial
 analysis or match of some sort, so you probably want to upload an `sf`
-or `raster` object. In fact, all GEE functions from the SABAP package
+or `raster` object. In fact, all GEE functions from the ABAP package
 work with pentads, and they must be uploaded from an `sf` object. For
-example to upload all SABAP pentads (remember that these are already on
+example to upload all ABAP pentads (remember that these are already on
 an `sf` format!), we can use:
 
 ``` r
-library(SABAP)
+library(ABAP)
 library(sf)
 library(dplyr, warn.conflicts = FALSE)
 
-# Load SABAP pentads
+# Load ABAP pentads
 pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 
 # Set an ID for your remote asset (data in GEE)
@@ -215,7 +216,7 @@ GEE [here](https://developers.google.com/earth-engine/datasets/catalog).
 If you want to use data from a single image you can use the function
 `addVarEEimage`.
 
-For example, let’s annotate our SABAP pentads with [surface water
+For example, let’s annotate our ABAP pentads with [surface water
 occurrence](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_3_GlobalSurfaceWater),
 which is the frequency with which water was present in each pixel. We’ll
 need the name of the layer in GEE, which is given in the field “Earth
@@ -241,7 +242,7 @@ Sometimes data don’t come in a single image, but in multiple images. For
 example, we might have one image for each day, week, month, etc. Again,
 we can check all available data in the [GEE
 catalog](https://developers.google.com/earth-engine/datasets/catalog).
-When we want to annotate data with a collection, SABAP offers two
+When we want to annotate data with a collection, ABAP offers two
 options:
 
 -   We can use `addVarEEcollection` to summarize the image collection
@@ -249,9 +250,9 @@ options:
 
 -   Or we can use `addVarEEclosestImage` to annotate each row in the
     data with the image in the collection that is closest in time. In
-    the SABAP context this is particularly useful to annotate visit
-    data, where we are interested in the conditions observers found
-    during their surveys.
+    the ABAP context this is particularly useful to annotate visit data,
+    where we are interested in the conditions observers found during
+    their surveys.
 
 We demonstrate both annotating data with the [TerraClimate
 dataset](https://developers.google.com/earth-engine/datasets/catalog/IDAHO_EPSCOR_TERRACLIMATE).
@@ -277,19 +278,19 @@ If we wanted to annotate with the closest image, instead of with a
 summary over time, then we need to upload visit data with an associated
 date to GEE. Dates must be in a character format (“yyyy-mm-dd”).
 
-As an example, let’s download SABAP2 data for the Maccoa Duck in 2010
-and annotate these data with TerraClimate’s minimum temperature data.
+As an example, let’s download ABAP data for the Maccoa Duck in 2010 and
+annotate these data with TerraClimate’s minimum temperature data.
 
 ``` r
-# Load SABAP pentads
+# Load ABAP pentads
 pentads <- getRegionPentads(.region_type = "country", .region = "South Africa")
 
 # Download Maccoa Duck
-id <- searchSabapSpecies("Duck") %>% 
+id <- searchAbapSpecies("Duck") %>% 
   filter(Common_species == "Maccoa") %>% 
   pull(SAFRING_No)
 
-visit <- getSabapData(.spp_code = id,
+visit <- getAbapData(.spp_code = id,
                       .region_type = "country",
                       .region = "South Africa",
                       .years = 2008)
