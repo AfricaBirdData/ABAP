@@ -12,6 +12,10 @@ Most of its functionality is experimental (especially that using Google
 Earth Engine) and under development, so use with caution and please send
 any feedback!
 
+For those of you that come from the SABAP package, please note that we
+have changed Sabap by Abap in the functions names so `getSabapData()`
+now becomes `getAbapData()`, etc. Sorry for the inconvenience!
+
 ## INSTRUCTIONS TO INSTALL
 
 To install from GitHub using the
@@ -27,7 +31,7 @@ A typical workflow entails defining a region and a species of interest,
 e.g. say we are interested in the occupancy of the African Black Duck in
 the North West province of South Africa:
 
-First find the ABAP code for the species:
+First find the ABAP code for the species (SAFRING code):
 
 ``` r
 library(ABAP)
