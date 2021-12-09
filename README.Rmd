@@ -31,7 +31,7 @@ in the functions names so `getSabapData()` now becomes `getAbapData()`, etc. Sor
 To install from GitHub using the [remotes](https://github.com/r-lib/remotes) package, run:
 
 ```{r, eval=FALSE}
-remotes::install_github("AfricanBirdData/ABAP")
+remotes::install_github("AfricaBirdData/ABAP")
 ```
 
 ## DOWNLOAD ABAP DATA

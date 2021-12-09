@@ -22,7 +22,7 @@ To install from GitHub using the
 [remotes](https://github.com/r-lib/remotes) package, run:
 
 ``` r
-remotes::install_github("AfricanBirdData/ABAP")
+remotes::install_github("AfricaBirdData/ABAP")
 ```
 
 ## DOWNLOAD ABAP DATA
