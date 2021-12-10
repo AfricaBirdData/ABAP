@@ -31,6 +31,7 @@ getAbapData <- function(.spp_code,
   }
 
   if(!is.null(.years)){
+    .years <- paste(.years, collapse = ",")
     .years <- paste0("&year=", .years)
   }
 
