@@ -26,6 +26,8 @@ getAbapData <- function(.spp_code,
 
   if(is.null(.region_type)){
     .region_type <- "country"
+  } else if(!.region_type %in% c("country", "province", "pentad")){
+    stop(".region_type must be one of 'country', 'province', 'pentad'")
   }
 
   if(!is.null(.years)){
@@ -43,7 +45,12 @@ getAbapData <- function(.spp_code,
   }
 
   # Extract data
-  myfile <- RCurl::getURL(url, ssl.verifyhost = FALSE, ssl.verifypeer = FALSE)
+  myfile <- httr::RETRY("GET", url) %>%
+    httr::content(as = "text", encoding = "UTF-8")
+
+  if(myfile == ""){
+    stop("We couldn't retrieve your querry. Please check your spelling and try again.")
+  }
 
   # Format
   out <- myfile %>%

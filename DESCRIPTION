@@ -17,8 +17,8 @@ RoxygenNote: 7.1.2
 Imports: 
     data.table,
     dplyr,
+    httr,
     magrittr,
-    RCurl,
     readr,
     rgee,
     rjson,
