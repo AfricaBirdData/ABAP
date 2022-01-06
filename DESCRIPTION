@@ -1,6 +1,6 @@
 Package: ABAP
 Title: Access to African Bird Atlas Project data
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
     person(given = "BIRDIE",
            family = "Development Team",
