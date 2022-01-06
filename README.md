@@ -126,7 +126,7 @@ once.
 -   To install `rgee`, follow these
     [instructions](https://github.com/r-spatial/rgee#installation).
 -   To configure Google Drive, follow these
-    [instructions](https://r-spatial.github.io/rgee/articles/setup.html).
+    [instructions](https://r-spatial.github.io/rgee/articles/rgee01.html).
 
 We have nothing to do with the above steps, so if you get stuck along
 the way, please search the web or contact the developers directly.

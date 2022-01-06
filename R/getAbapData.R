@@ -50,7 +50,7 @@ getAbapData <- function(.spp_code,
     httr::content(as = "text", encoding = "UTF-8")
 
   if(myfile == ""){
-    stop("We couldn't retrieve your querry. Please check your spelling and try again.")
+    stop("We couldn't retrieve your query. Please check your spelling and try again.")
   }
 
   # Format
