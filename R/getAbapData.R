@@ -38,7 +38,7 @@ getAbapData <- function(.spp_code,
   .region <- tolower(.region)
   .region <- gsub(" ", "", .region)
 
-  url <- paste0("http://api.birdmap.africa/sabap2/v2/cards/species/85ee37929696cba93e1cdda4dbb3f93a/", .spp_code, "/",
+  url <- paste0("https://api.birdmap.africa/sabap2/v2/cards/species/85ee37929696cba93e1cdda4dbb3f93a/", .spp_code, "/",
                 .region_type, "/", .region, "?format=csv&inclnull=1", .years)
 
   if(.adhoc){

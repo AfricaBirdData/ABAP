@@ -21,9 +21,9 @@ searchAbapSpecies <- function(species){
   old <- grepl("[a-z]", species, ignore.case = TRUE)
 
   if(old){
-    url <- paste0("http://api.adu.org.za/sabap2/v2/search/species/", species)
+    url <- paste0("https://api.birdmap.africa/sabap2/v2/search/species/", species)
   } else {
-    url <- paste0("http://api.birdmap.africa/sabap2/v2/species/info/", species, "?curt=1")
+    url <- paste0("https://api.birdmap.africa/sabap2/v2/species/info/", species, "?curt=1")
   }
 
   # Extract data
