@@ -18,10 +18,12 @@ Imports:
     data.table,
     dplyr,
     httr,
+    lubridate,
     magrittr,
     readr,
     rgee,
     rjson,
-    sf
+    sf,
+    unmarked
 Depends: 
     R (>= 2.10)
