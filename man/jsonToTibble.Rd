@@ -17,7 +17,8 @@ Helper function to transform a JSON object to a tibble
 }
 \examples{
 url <- "http://api.adu.org.za/cwac/sites/list?province=north20\%west"
-myfile <- RCurl::getURL(url, ssl.verifyhost = FALSE, ssl.verifypeer = FALSE)
+myfile <- httr::RETRY("GET", url) \%>\%
+         httr::content(as = "text", encoding = "UTF-8")
 jsonfile <- rjson::fromJSON(myfile)
 jsonToTibble(jsonfile)
 }
