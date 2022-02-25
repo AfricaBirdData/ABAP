@@ -1,17 +1,33 @@
-#' ABAP to unmarked (single season)
+#' ABAP to unmarked (single-season)
 #'
-#' @description Transforms a raw ABAP data frame into an unmarked-ready data frame
-#' @param abap_data ABAP data downloaded using \code{\link{getAbapData}}
+#' @description This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}}) into an \code{\link[unmarked]{unmarkedFrameOccu}} object which can be used to fit single-season occupancy models using \code{\link[unmarked]{occu}} (MacKenzie et. al 2002) or \code{\link[unmarked]{occuRN}} (Royle and Nichols, 2003) in `unmarked`.
 #'
-#' @return An object in the same format as that returned by \code{\link[unmarked]{unmarkedFrameOccu}}
-#' @note Total hours and Julian day are automatically added as observation-level covariates
+#' \code{\link[unmarked]{unmarkedFrameOccu}} objects can also be used to fit \code{\link[ubms]{stan_occu}} or \code{\link[ubms]{stan_occuRN}} models from the `ubms` package (which fits Unmarked Bayesian Models with Stan).
+#'
+#'
+#' @param abap_data single-season ABAP data downloaded using \code{\link{getAbapData}}
+#'
+#' @details In addition to reformatting the detection/non-detection ABAP data for use in `unmarked`  and `ubms` occupancy models, this function also extracts two survey-level covariates: ` hours` and `jday`. The `hours` variable is the total number of hours spent atlassing which is recorded on the pentad card and `jday` is the Julian day corresponding to the first day of atlassing for that card.
+#'
+#' @return an object of class  \code{\link[unmarked]{unmarkedFrameOccu}}
+#'
+#' @seealso \code{\link[unmarked]{occu}}, \code{\link[unmarked]{occuRN}}, \code{\link[ubms]{stan_occu}}, \code{\link[ubms]{stan_occuRN}}
+#'
+#' @author Dominic Henry <dominic.henry@gmail.com> \cr
+#' Pachi Cervantes
+#'
+#' @references
+#' MacKenzie, D. I., J. D. Nichols, G. B. Lachman, S. Droege, J. Andrew Royle, and C. A. Langtimm. 2002. Estimating Site Occupancy Rates When Detection Probabilities Are Less Than One. Ecology 83: 2248-2255.
+#'
+#' Royle, J. A. and Nichols, J. D. (2003) Estimating Abundance from Repeated Presence-Absence
+#' Data or Point Counts. Ecology, 84(3) pp. 777-790.
 #' @export
 #'
 #' @examples
 #' abap_single <- getAbapData(.spp_code = 212,
-#'                           .region_type = "province",
-#'                           .region = "Eastern Cape",
-#'                           .years = 2012)
+#'                            .region_type = "province",
+#'                            .region = "Eastern Cape",
+#'                            .years = 2012)
 #'
 #' um_df <- abapToUnmarked_single(abap_single)
 abapToUnmarked_single <- function(abap_data){
