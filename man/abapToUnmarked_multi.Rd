@@ -2,18 +2,21 @@
 % Please edit documentation in R/abapToUnmarked_multi.R
 \name{abapToUnmarked_multi}
 \alias{abapToUnmarked_multi}
-\title{ABAP to unmarked}
+\title{ABAP to unmarked (multi-season)}
 \usage{
 abapToUnmarked_multi(abap_data)
 }
 \arguments{
-\item{abap_data}{ABAP data dowloaded using \link{getAbapData}.}
+\item{abap_data}{multi-season ABAP data downloaded using \code{\link{getAbapData}}.}
 }
 \value{
-An \link{unmarkedMultFrame}
+an object of class \code{\link[unmarked]{unmarkedMultFrame}}
 }
 \description{
-Transforms a raw ABAP data into multiseason unmarked-ready data
+This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}}) into an \code{\link[unmarked]{unmarkedMultFrame}} object which can be used to fit dynamic occupancy models using \code{\link[unmarked]{colext}} (MacKenzie et. al 2003) and \code{\link[ubms]{stan_colext}} from the \code{ubms} package (which fits Unmarked Bayesian Models with Stan).
+}
+\details{
+In addition to reformatting the detection/non-detection ABAP data for use in \code{unmarked} and \code{ubms} occupancy models, this function also extracts two survey-level covariates: \code{hours} and \code{jday}. The \code{hours} variable is the total number of hours spent atlassing which is recorded on the pentad card and \code{jday} is the Julian day corresponding to the first day of atlassing for that card. The function also adds the sampling year as a \code{yearlySiteCovs} which allows year to be used in the formula for colonization, extinction and detection probability.
 }
 \examples{
 abap_multi <- getAbapData(.spp = 212,
@@ -22,4 +25,14 @@ abap_multi <- getAbapData(.spp = 212,
                           .years = c(2009,2010,2011,2012))
 
 um_df <- abapToUnmarked_multi(abap_multi)
+}
+\references{
+MacKenzie, D. I., J. D. Nichols, J. E. Hines, M. G. Knutson, and A. B. Franklin. 2003. Estimating site occupancy, colonization, and local extinction when a species is detected imperfectly. Ecology 84:2200-2207.
+}
+\seealso{
+\code{\link[unmarked]{colext}}, \code{\link[ubms]{stan_colext}}
+}
+\author{
+Dominic Henry \href{mailto:dominic.henry@gmail.com}{dominic.henry@gmail.com} \cr
+Pachi Cervantes
 }
