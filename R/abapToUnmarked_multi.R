@@ -1,9 +1,20 @@
-#' ABAP to unmarked
+#' ABAP to unmarked (multi-season)
 #'
-#' @description Transforms a raw ABAP data into multiseason unmarked-ready data
-#' @param abap_data ABAP data dowloaded using \link{getAbapData}.
+#' @description This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}}) into an \code{\link[unmarked]{unmarkedMultFrame}} object which can be used to fit dynamic occupancy models using \code{\link[unmarked]{colext}} (MacKenzie et. al 2003) and \code{\link[ubms]{stan_colext}} from the `ubms` package (which fits Unmarked Bayesian Models with Stan).
 #'
-#' @return An \link{unmarkedMultFrame}
+#' @param abap_data multi-season ABAP data downloaded using \code{\link{getAbapData}}.
+#'
+#' @return an object of class \code{\link[unmarked]{unmarkedMultFrame}}
+#'
+#' @details In addition to reformatting the detection/non-detection ABAP data for use in `unmarked` and `ubms` occupancy models, this function also extracts two survey-level covariates: `hours` and `jday`. The `hours` variable is the total number of hours spent atlassing which is recorded on the pentad card and `jday` is the Julian day corresponding to the first day of atlassing for that card. The function also adds the sampling year as a `yearlySiteCovs` which allows year to be used in the formula for colonization, extinction and detection probability.
+#' @seealso \code{\link[unmarked]{colext}}, \code{\link[ubms]{stan_colext}}
+#'
+#' @author Dominic Henry <dominic.henry@gmail.com> \cr
+#' Pachi Cervantes
+#'
+#' @references
+#' MacKenzie, D. I., J. D. Nichols, J. E. Hines, M. G. Knutson, and A. B. Franklin. 2003. Estimating site occupancy, colonization, and local extinction when a species is detected imperfectly. Ecology 84:2200-2207.
+#'
 #' @export
 #'
 #' @examples
