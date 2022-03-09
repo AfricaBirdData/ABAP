@@ -7,21 +7,19 @@ cff-version: 1.2.0
 message: 'To cite package "ABAP" in publications use:'
 type: software
 license: MIT
-title: 'ABAP: Access to African Bird Atlas Project data'
+title: 'ABAP: Access to African Bird Atlas Project data from R'
 version: 0.0.4
 abstract: This package provides functions to access the ABAP server API and download
   data.
 authors:
-- family-names: Development Team
-  given-names: BIRDIE
+- name: BIRDIE Development Team
   email: f.cervantesperalta@gmail.com
   orcid: https://orcid.org/YOUR-ORCID-ID
 preferred-citation:
   type: manual
-  title: 'ABAP: Access to African Bird Atlas Project data'
+  title: 'ABAP: Access to African Bird Atlas Project data from R'
   authors:
-  - family-names: Development Team
-    given-names: BIRDIE
+  - name: BIRDIE Development Team
     email: f.cervantesperalta@gmail.com
     orcid: https://orcid.org/YOUR-ORCID-ID
   version: 0.0.4
@@ -30,8 +28,7 @@ preferred-citation:
   repository-code: https://github.com/AfricaBirdData/ABAP
   url: https://github.com/AfricaBirdData/ABAP
   contact:
-  - family-names: Development Team
-    given-names: BIRDIE
+  - name: BIRDIE Development Team
     email: f.cervantesperalta@gmail.com
     orcid: https://orcid.org/YOUR-ORCID-ID
   license: MIT
@@ -39,8 +36,7 @@ preferred-citation:
 repository-code: https://github.com/AfricaBirdData/ABAP
 url: https://github.com/AfricaBirdData/ABAP
 contact:
-- family-names: Development Team
-  given-names: BIRDIE
+- name: BIRDIE Development Team
   email: f.cervantesperalta@gmail.com
   orcid: https://orcid.org/YOUR-ORCID-ID
 references:

@@ -1,9 +1,8 @@
 Package: ABAP
-Title: Access to African Bird Atlas Project data
+Title: Access to African Bird Atlas Project data from R
 Version: 0.0.4
 Authors@R: 
-    person(given = "BIRDIE",
-           family = "Development Team",
+    person(given = "BIRDIE Development Team",
            role = c("aut", "cre"),
            email = "f.cervantesperalta@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
