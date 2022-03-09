@@ -27,6 +27,8 @@ preferred-citation:
   version: 0.0.4
   abstract: This package provides functions to access the ABAP server API and download
     data.
+  repository-code: https://github.com/AfricaBirdData/ABAP
+  url: https://github.com/AfricaBirdData/ABAP
   contact:
   - family-names: Development Team
     given-names: BIRDIE
@@ -34,6 +36,8 @@ preferred-citation:
     orcid: https://orcid.org/YOUR-ORCID-ID
   license: MIT
   year: '2022'
+repository-code: https://github.com/AfricaBirdData/ABAP
+url: https://github.com/AfricaBirdData/ABAP
 contact:
 - family-names: Development Team
   given-names: BIRDIE
