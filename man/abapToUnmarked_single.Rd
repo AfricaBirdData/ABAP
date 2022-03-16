@@ -4,10 +4,12 @@
 \alias{abapToUnmarked_single}
 \title{ABAP to unmarked (single-season)}
 \usage{
-abapToUnmarked_single(abap_data)
+abapToUnmarked_single(abap_data, pentads = NULL)
 }
 \arguments{
 \item{abap_data}{single-season ABAP data downloaded using \code{\link{getAbapData}}}
+
+\item{pentads}{an \code{sf} object returned by \code{\link{getRegionPentads}}. Defaults to \code{NULL}.}
 }
 \value{
 an object of class  \code{\link[unmarked]{unmarkedFrameOccu}}
@@ -18,7 +20,10 @@ This function transforms a raw ABAP data frame (returned by \code{\link{getAbapD
 \code{\link[unmarked]{unmarkedFrameOccu}} objects can also be used to fit \code{\link[ubms]{stan_occu}} or \code{\link[ubms]{stan_occuRN}} models from the \code{ubms} package (which fits Unmarked Bayesian Models with Stan).
 }
 \details{
-In addition to reformatting the detection/non-detection ABAP data for use in \code{unmarked}  and \code{ubms} occupancy models, this function also extracts two survey-level covariates: \code{ hours} and \code{jday}. The \code{hours} variable is the total number of hours spent atlassing which is recorded on the pentad card and \code{jday} is the Julian day corresponding to the first day of atlassing for that card.
+In addition to reformatting the detection/non-detection ABAP data for use in \code{unmarked}  and \code{ubms} occupancy models, this function also extracts two survey-level covariates: \code{ hours} and \code{jday}. The \code{hours} variable is the total number of hours spent atlassing which is recorded on the pentad card and \code{jday} is the Julian day corresponding to the first day of atlassing for that card. If \code{pentads} are provided the \code{unmarked} frame will add the x and y coordinates as site covariates (\code{siteCovs}). The spatial data can be used as random effects to run a restricted spatial regression (RSR) occupancy model in \code{ubms}. See \code{\link[ubms]{RSR}} for more details.
+}
+\note{
+It's important to make sure that the \code{.region_type} and \code{.region} are the same when extracting \code{abap_data} and \code{pentads} (see example below).
 }
 \examples{
 abap_single <- getAbapData(.spp_code = 212,
@@ -26,7 +31,15 @@ abap_single <- getAbapData(.spp_code = 212,
                            .region = "Eastern Cape",
                            .years = 2012)
 
+abap_pentads <- getRegionPentads(.region_type = "province",
+                                 .region = "Eastern Cape")
+
+## Return unmarked frame no site covariates
 um_df <- abapToUnmarked_single(abap_single)
+
+## Return unmarked frame with Pentad coordinates as site covariates
+um_df <- abapToUnmarked_single(abap_single, abap_pentads)
+
 }
 \references{
 MacKenzie, D. I., J. D. Nichols, G. B. Lachman, S. Droege, J. Andrew Royle, and C. A. Langtimm. 2002. Estimating Site Occupancy Rates When Detection Probabilities Are Less Than One. Ecology 83: 2248-2255.
