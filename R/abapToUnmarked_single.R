@@ -55,6 +55,8 @@ abapToUnmarked_single <- function(abap_data, pentads = NULL){
     ## Extract spatial data
     if(!is.null(pentads)){
 
+        sf::st_agr(pentads) = "constant"
+
         pentad_xy <- pentads %>%
             dplyr::filter(pentad %in% pentad_id) %>%
             sf::st_centroid() %>%
