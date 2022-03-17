@@ -46,12 +46,12 @@ abapToSpOcc_single <- function(abap_data, pentads = NULL){
     ## Extract spatial data
     if(!is.null(pentads)){
 
-        pentads <- pentads %>%
-            dplyr::filter(pentad %in% pentad_id)
+        sf::st_agr(pentads) = "constant"
 
-        pentad_xy <- sf::st_coordinates(
-            sf::st_centroid(pentads)
-        )
+        pentad_xy <- pentads %>%
+            dplyr::filter(pentad %in% pentad_id) %>%
+            sf::st_centroid() %>%
+            sf::st_coordinates()
     }
 
     ## Create empty arrays
