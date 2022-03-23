@@ -15,15 +15,15 @@ getCardRecords <- function(.CardNo){
     myfile <- httr::RETRY("GET", url) %>%
         httr::content(as = "text", encoding = "UTF-8")
 
-    if(myfile == ""){
-        stop("We couldn't retrieve your query. Please check your spelling and try again.")
-    }
-
     jsonfile <- rjson::fromJSON(myfile)
 
     out <- jsonfile$data$cards[[1]]$records %>%
         data.table::rbindlist(fill = TRUE) %>%
         dplyr::as_tibble()
+
+    if(sum(dim(out)) == 0){
+        warning("There are no species records for that entry. You may need to check the card number.")
+    }
 
     return(out)
 
