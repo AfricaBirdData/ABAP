@@ -43,7 +43,7 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
 
   # Get image
   if(is.character(collection)){
-    ee_layer <- ee$ImageCollection(collection)$
+    ee_layer <- rgee::ee$ImageCollection(collection)$
       filterDate(dates[1], dates[2])
   } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
     ee_layer <- collection$
@@ -66,16 +66,16 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
   }
 
   # Reduce to image
-  temp_reducer <- paste0("ee$Reducer$", temp_reducer, "()")
+  temp_reducer <- paste0("rgee::ee$Reducer$", temp_reducer, "()")
   ee_layer <- ee_layer$reduce(eval(parse(text = temp_reducer)))
 
   # Extract layer values
-  spt_reducer <- paste0("ee$Reducer$", spt_reducer, "()")
+  spt_reducer <- paste0("rgee::ee$Reducer$", spt_reducer, "()")
   pentads_layer <- ee_layer %>%
-    ee$Image$reduceRegions(ee_pentads,
-                           eval(parse(text = spt_reducer)),
-                           scale = scale) %>%
-    ee_as_sf(via = "drive")
+    rgee::ee$Image$reduceRegions(ee_pentads,
+                                 eval(parse(text = spt_reducer)),
+                                 scale = scale) %>%
+    rgee::ee_as_sf(via = "drive")
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){

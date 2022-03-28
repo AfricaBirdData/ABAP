@@ -34,7 +34,7 @@ addVarEEimage <- function(ee_pentads, image, reducer,
 
   # Get image
   if(is.character(image)){
-    ee_layer <- ee$Image(image)
+    ee_layer <- rgee::ee$Image(image)
   } else if("ee.image.Image" %in% class(image)){
     ee_layer <- image
   } else {
@@ -55,12 +55,12 @@ addVarEEimage <- function(ee_pentads, image, reducer,
   scale <- ee_layer$projection()$nominalScale()$getInfo()
 
   # Extract layer values
-  reducer <- paste0("ee$Reducer$", reducer, "()")
+  reducer <- paste0("rgee::ee$Reducer$", reducer, "()")
   pentads_layer <- ee_layer %>%
-    ee$Image$reduceRegions(ee_pentads,
-                           eval(parse(text = reducer)),
-                           scale = scale) %>%
-    ee_as_sf(via = "drive")
+    rgee::ee$Image$reduceRegions(ee_pentads,
+                                 eval(parse(text = reducer)),
+                                 scale = scale) %>%
+    rgee::ee_as_sf(via = "drive")
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){
