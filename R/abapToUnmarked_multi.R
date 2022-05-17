@@ -98,7 +98,10 @@ abapToUnmarked_multi <- function(abap_data){
     }
 
     ## Convert 3 dimensional array to matrix format
-    Y <- matrix(Y, n_sites, max_visits*n_occasions)
+    Y <- matrix(Y, n_sites, max_visits*n_occasions,
+                dimnames = list(pentad_id,
+                                NULL))
+
     obs_hours <- matrix(obs_hours, n_sites, max_visits*n_occasions)
     obs_jday <- matrix(obs_jday, n_sites, max_visits*n_occasions)
 
