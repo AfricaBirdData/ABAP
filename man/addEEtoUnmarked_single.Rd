@@ -7,7 +7,7 @@
 addEEtoUnmarked_single(umf, ee_data, ee_name)
 }
 \arguments{
-\item{umf}{an single-season Unmarked frame containing ABAP detection/non-detection data returned by \code{\link{abapToUnmarked_single}}.}
+\item{umf}{a single-season Unmarked frame containing ABAP detection/non-detection data returned by \code{\link{abapToUnmarked_single}}.}
 
 \item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}.}
 
@@ -17,10 +17,10 @@ addEEtoUnmarked_single(umf, ee_data, ee_name)
 an object of class \code{\link[unmarked]{unmarkedFrameOccu}} with survey and site covariates.
 }
 \description{
-Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. This function can then be used to add these types of data to a single-season Unmarked frame. GEE data can then be used as covariates in single-season occupancy models.
+Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. \code{addEEtoUnmarked_single} can then be used to add these types of data to a single-season Unmarked frame. GEE data can subsquently be used as covariates in single-season occupancy models such as \code{\link[unmarked]{occu}}, \code{\link[unmarked]{occuRN}}, \code{\link[ubms]{stan_occu}} or \code{\link[ubms]{stan_occuRN}}.
 }
 \note{
-The numeric ranges of various GEE data can be vastly different so it is advised that you scale your covariate data before running an occupancy model. This can be done within the formula notation of the \code{\link[unmarked]{occu}} function.
+The numeric ranges of various GEE data can be vastly different so it is advised that you scale your covariate data before running an occupancy model. This can be done within the formula notation of the various \code{\link[unmarked]{occu}} functions.
 }
 \examples{
 \dontrun{
