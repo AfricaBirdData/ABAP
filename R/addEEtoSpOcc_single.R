@@ -1,17 +1,17 @@
 #' Add Google Earth Engine covariate data to a list for use in spOccupancy
 #'
-#' @description Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. `addEEtoSpOcc_single` can then be used to add these types of data to a list in order to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial) from the `spOccupancy`package.
+#' @description Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. `addEEtoSpOcc_single` can then be used to add these types of data to a list in order to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial) from the `spOccupancy` package.
 #'
-#' @param spOcc an list containing ABAP detection/non-detection data returned by \code{\link{abapToSpOcc_single}}.
+#' @param spOcc a list containing ABAP detection/non-detection data returned by \code{\link{abapToSpOcc_single}}.
 #' @param ee_data a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}.
-#' @param ee_name a user-defined character string giving the desired name of the GEE site or site-year covariate.
+#' @param ee_name a user-defined character string giving the desired name of the GEE site covariate.
 #'
 #' @note The numeric ranges of various GEE data can be vastly different so it is advised that you scale your covariate data before running an occupancy model. See example below for how to do this.
 #'
 #' @author Dominic Henry <dominic.henry@gmail.com> \cr
 #' Pachi Cervantes
 #'
-#' @seealso \code{\link[spOccupancy]{spPGOcc}}, \code{\link[spOccupancy]{PGOcc}}, \code{\link{addVarEEimage}}, \code{\link{addVarEEcollection}}
+#' @seealso \code{\link{abapToSpOcc_single}}, \code{\link[spOccupancy]{spPGOcc}}, \code{\link[spOccupancy]{PGOcc}}, \code{\link{addVarEEimage}}, \code{\link{addVarEEcollection}}
 #'
 #' @export
 #'

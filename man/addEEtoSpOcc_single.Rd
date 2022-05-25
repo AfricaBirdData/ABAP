@@ -7,14 +7,14 @@
 addEEtoSpOcc_single(spOcc, ee_data, ee_name)
 }
 \arguments{
-\item{spOcc}{an list containing ABAP detection/non-detection data returned by \code{\link{abapToSpOcc_single}}.}
+\item{spOcc}{a list containing ABAP detection/non-detection data returned by \code{\link{abapToSpOcc_single}}.}
 
 \item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}.}
 
-\item{ee_name}{a user-defined character string giving the desired name of the GEE site or site-year covariate.}
+\item{ee_name}{a user-defined character string giving the desired name of the GEE site covariate.}
 }
 \description{
-Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. \code{addEEtoSpOcc_single} can then be used to add these types of data to a list in order to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial) from the \code{spOccupancy}package.
+Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. \code{addEEtoSpOcc_single} can then be used to add these types of data to a list in order to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial) from the \code{spOccupancy} package.
 }
 \note{
 The numeric ranges of various GEE data can be vastly different so it is advised that you scale your covariate data before running an occupancy model. See example below for how to do this.
@@ -93,7 +93,7 @@ summary(spOcc_single_ee$occ.covs)
 }
 }
 \seealso{
-\code{\link[spOccupancy]{spPGOcc}}, \code{\link[spOccupancy]{PGOcc}}, \code{\link{addVarEEimage}}, \code{\link{addVarEEcollection}}
+\code{\link{abapToSpOcc_single}}, \code{\link[spOccupancy]{spPGOcc}}, \code{\link[spOccupancy]{PGOcc}}, \code{\link{addVarEEimage}}, \code{\link{addVarEEcollection}}
 }
 \author{
 Dominic Henry \href{mailto:dominic.henry@gmail.com}{dominic.henry@gmail.com} \cr
