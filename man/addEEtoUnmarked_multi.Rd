@@ -39,7 +39,7 @@ abap_multi <- getAbapData(.spp = 212,
                           .region = "Eastern Cape",
                           .years = c(2009,2010,2011,2012))
 
-## Create unmarked frame (with X & Y coords as site covariates)
+## Create unmarked frame
 umf_multi <- abapToUnmarked_multi(abap_multi)
 summary(umf_multi)
 
@@ -93,7 +93,7 @@ summary(umf_multi_ee)
 
 ## Add all covariates simultaneously using the pipe operator
 umf_multi_ee <- umf_multi \%>\%
-    addEEtoUnmarked_multi(., water_mean, "water_man", "site") \%>\%
+    addEEtoUnmarked_multi(., water_mean, "water_mean", "site") \%>\%
     addEEtoUnmarked_multi(., ndvi_multi_mean, "ndvi_mean", "site-year") \%>\%
     addEEtoUnmarked_multi(., ndvi_multi_max, "ndvi_max", "site-year")
 
