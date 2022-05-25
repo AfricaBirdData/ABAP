@@ -3,10 +3,19 @@
 #' @description This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}}) into an \code{\link[unmarked]{unmarkedMultFrame}} object which can be used to fit dynamic occupancy models using \code{\link[unmarked]{colext}} (MacKenzie et. al 2003) and \code{\link[ubms]{stan_colext}} from the `ubms` package (which fits Unmarked Bayesian Models with Stan).
 #'
 #' @param abap_data multi-season ABAP data downloaded using \code{\link{getAbapData}}.
+#' @param pentads an `sf` object returned by \code{\link{getRegionPentads}}. Defaults to `NULL`.
 #'
 #' @return an object of class \code{\link[unmarked]{unmarkedMultFrame}}
 #'
-#' @details In addition to reformatting the detection/non-detection ABAP data for use in `unmarked` and `ubms` occupancy models, this function also extracts two survey-level covariates: `hours` and `jday`. The `hours` variable is the total number of hours spent atlassing which is recorded on the pentad card and `jday` is the Julian day corresponding to the first day of atlassing for that card. The function also adds the sampling year as a `yearlySiteCovs` which allows year to be used in the formula for colonization, extinction and detection probability.
+#' @details In addition to reformatting the detection/non-detection ABAP data for use in `unmarked` and `ubms` occupancy models, this function also extracts two survey-level covariates: `hours` and `jday`. The `hours` variable is the total number of hours spent atlassing which is recorded on the pentad card and `jday` is the Julian day corresponding to the first day of atlassing for that card.\cr
+#'
+#' The function also adds the sampling year as a `yearlySiteCovs` which allows year to be used in the formula for colonization, extinction and detection probability.\cr
+#'
+#' If `pentads` are provided the `unmarked` frame will add the X and Y coordinates as site-level covariates (`siteCovs`).
+#'
+#' @note The processing time of `abapToUnmarked_multi` can be considerably long if the number of cards and pentads of the focal species is high, so patience may be required.
+
+#'
 #' @seealso \code{\link[unmarked]{colext}}, \code{\link[ubms]{stan_colext}}
 #'
 #' @author Dominic Henry <dominic.henry@gmail.com> \cr
@@ -18,13 +27,23 @@
 #' @export
 #'
 #' @examples
+#' library(unmarked)
 #' abap_multi <- getAbapData(.spp = 212,
 #'                           .region_type = "province",
 #'                           .region = "Eastern Cape",
 #'                           .years = c(2009,2010,2011,2012))
 #'
+#' abap_pentads <- getRegionPentads(.region_type = "province",
+#'                                   .region = "Eastern Cape")
+#'
+#' ## Return unmarked frame no site covariates
 #' um_df <- abapToUnmarked_multi(abap_multi)
-abapToUnmarked_multi <- function(abap_data){
+#' summary(um_df)
+#'
+#' ## Return unmarked frame with Pentad coordinates as site covariates
+#' um_df <- abapToUnmarked_multi(abap_data = abap_multi, pentads = abap_pentads)
+#' summary(um_df)
+abapToUnmarked_multi <- function(abap_data, pentads = NULL){
 
     abap_data <- abap_data %>%
         dplyr::mutate(year = lubridate::year(StartDate))
@@ -46,6 +65,23 @@ abapToUnmarked_multi <- function(abap_data){
         dplyr::count(Pentad, year) %>%
         dplyr::pull(n) %>%
         max()
+
+    ## Extract spatial data
+    if(!is.null(pentads)){
+
+        sf::st_agr(pentads) = "constant"
+
+        pentad_xy <- pentads %>%
+            dplyr::filter(pentad %in% pentad_id) %>%
+            sf::st_centroid() %>%
+            sf::st_coordinates() %>%
+            as.data.frame() %>%
+            dplyr::rename_all(tolower)
+
+    } else {
+
+        pentad_xy <- NULL
+    }
 
     ## Create empty arrays
     Y <- array(NA, dim = c(n_sites, max_visits, n_occasions),
@@ -112,6 +148,7 @@ abapToUnmarked_multi <- function(abap_data){
     umf_abap <- unmarked::unmarkedMultFrame(y = Y,
                                             obsCovs = list(hours = obs_hours,
                                                            jday = obs_jday),
+                                            siteCovs = pentad_xy,
                                             yearlySiteCovs = list(year = year),
                                             numPrimary = n_occasions)
 
