@@ -55,17 +55,17 @@ addVarEEimage <- function(ee_pentads, image, reducer,
   scale <- ee_layer$projection()$nominalScale()$getInfo()
 
   # Extract layer values
-  reducer <- paste0("rgee::ee$Reducer$", reducer, "()")
+  eeReducer <- paste0("rgee::ee$Reducer$", reducer, "()")
   pentads_layer <- ee_layer %>%
     rgee::ee$Image$reduceRegions(ee_pentads,
-                                 eval(parse(text = reducer)),
+                                 eval(parse(text = eeReducer)),
                                  scale = scale) %>%
     rgee::ee_as_sf(via = "drive")
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){
     pentads_layer <- pentads_layer %>%
-      dplyr::rename("{bands}" := ncol(pentads_layer) - 1)
+        dplyr::rename("{bands}" := reducer)
   }
 
   # This should do something similar but get problems with maxFeatures
