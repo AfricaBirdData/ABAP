@@ -4,14 +4,16 @@
 \alias{addEEtoUnmarked_single}
 \title{Add Google Earth Engine covariate data to a single-season Unmarked frame}
 \usage{
-addEEtoUnmarked_single(umf, ee_data, ee_name)
+addEEtoUnmarked_single(umf, ee_data, ee_names = NULL)
 }
 \arguments{
 \item{umf}{a single-season Unmarked frame containing ABAP detection/non-detection data returned by \code{\link{abapToUnmarked_single}}.}
 
 \item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}.}
 
-\item{ee_name}{a user-defined character string giving the desired name of the GEE site covariate.}
+\item{ee_names}{a user-defined character vector giving the names of the GEE site covariates
+we want to transfer. If not provided a wild guess will be made based on what variables are
+expected to be on an ABAP dataframe.}
 }
 \value{
 an object of class \code{\link[unmarked]{unmarkedFrameOccu}} with survey and site covariates.
@@ -73,19 +75,19 @@ water_mean <- addVarEEimage(ee_pentads = pentads,
 ## Add to NDVI covariate to unmarked frame
 umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
                                        ee_data = ndvi_mean,
-                                       ee_name = "NDVI_mean")
+                                       ee_names = "NDVI_mean")
 summary(umf_single_ee)
 
 ## Add surface water covariate to unmarked frame
 umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
                                        ee_data = water_mean,
-                                       ee_name = "water_mean")
+                                       ee_names = "water_mean")
 summary(umf_single_ee)
 
-## Add both covariates simultaneously using the pipe operator
-umf_single_ee <- umf_single \%>\%
-   addEEtoUnmarked_single(., ndvi_mean, "NDVI_mean") \%>\%
-   addEEtoUnmarked_single(., water_mean, "water_mean")
+## Add both covariates simultaneously
+umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
+                                       ee_data = water_mean,
+                                       ee_names = c("water_mean", "NDVI_mean")
 
 summary(umf_single_ee)
 }

@@ -42,9 +42,6 @@ will be annotated with all bands (one column for each band).}
 computing means, counts, etc. Sometimes we might want to avoid this behaviour
 and use 0 instead of NA. If so, set unmask to TRUE.}
 }
-\value{
-
-}
 \description{
 Add variable from Google Earth Engine Collection
 }

@@ -2,6 +2,7 @@
 
 export("%>%")
 export(EEcollectionToMultiband)
+export(abapTo)
 export(abapToSpOcc_single)
 export(abapToUnmarked_multi)
 export(abapToUnmarked_single)

@@ -39,9 +39,6 @@ applying any reduction (each image goes to a band).}
 computing means, counts, etc. Sometimes we might want to avoid this behaviour
 and use 0 instead of NA. If so, set unmask to TRUE.}
 }
-\value{
-
-}
 \description{
 Convert a GEE collection to multiband image
 }
