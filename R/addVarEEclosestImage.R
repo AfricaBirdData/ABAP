@@ -43,7 +43,7 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
 
   # Get image
   if(is.character(collection)){
-    ee_layer <- ee$ImageCollection(collection)
+    ee_layer <- rgee::ee$ImageCollection(collection)
   } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
     ee_layer <- collection
   } else {
@@ -66,7 +66,7 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
 
   # Function to add date in milliseconds
   addTime <- function(feature) {
-    datemillis <- ee$Date(feature$get('Date'))$millis()
+    datemillis <- rgee::ee$Date(feature$get('Date'))$millis()
     return(feature$set(list('date_millis' = datemillis)))
   }
 
@@ -74,14 +74,14 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
   ee_pentads <- ee_pentads$map(addTime)
 
   # Set filter to select images within max time difference
-  maxDiffFilter = ee$Filter$maxDifference(
+  maxDiffFilter = rgee::ee$Filter$maxDifference(
     difference = maxdiff*24*60*60*1000,        # days * hr * min * sec * milliseconds
     leftField = "date_millis",                 # Timestamp of the visit
     rightField = "system:time_start"           # Image date
   )
 
   # Set a saveBest join that finds the image closest in time
-  saveBestJoin <- ee$Join$saveBest(
+  saveBestJoin <- rgee::ee$Join$saveBest(
     matchKey = "bestImage",
     measureKey = "timeDiff"
   )
@@ -90,16 +90,16 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
   best_matches <- saveBestJoin$apply(ee_pentads, ee_layer, maxDiffFilter)
 
   # Function to add value from the matched image
-  reducer <- paste0("ee$Reducer$", reducer, "()")
+  reducer <- paste0("rgee::ee$Reducer$", reducer, "()")
   add_value <- function(feature){
 
     # Get the image selected by the join
-    img <- ee$Image(feature$get("bestImage"))$select(bands)
+    img <- rgee::ee$Image(feature$get("bestImage"))$select(bands)
 
     # Reduce values within pentad
     pentad_val <- img$reduceRegion(eval(parse(text = reducer)),
-                                  feature$geometry(),
-                                  scale)
+                                   feature$geometry(),
+                                   scale)
 
     # Return the data containing value and image date.
     return(feature$set('val', pentad_val$get(bands),
@@ -109,7 +109,7 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
 
   # Add values to the data and download
   out <- best_matches$map(add_value) %>%
-    ee_as_sf(via = 'drive')
+    rgee::ee_as_sf(via = 'drive')
 
   return(out)
 

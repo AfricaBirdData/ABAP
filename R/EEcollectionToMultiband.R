@@ -39,7 +39,7 @@ EEcollectionToMultiband <- function(collection, dates, band,
 
   # Get image
   if(is.character(collection)){
-    ee_layer <- ee$ImageCollection(collection)$
+    ee_layer <- rgee::ee$ImageCollection(collection)$
       select(band)$
       filterDate(dates[1], dates[2])
   } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
@@ -51,29 +51,29 @@ EEcollectionToMultiband <- function(collection, dates, band,
   }
 
   # Get nominal scale for the layer (native resolution) and projection
-  ee_proj <- ee$Projection(ee_layer$first()$projection())
+  ee_proj <- rgee::ee$Projection(ee_layer$first()$projection())
 
   # Remove missing values (this will depend on the layer)
   if(unmask){
-    ee_layer <- ee_layer$map(
-        ee_utils_pyfunc(
-          function(image){
-            return(image$unmask())
-          }))
+    ee_layer <- rgee::ee_layer$map(
+      rgee::ee_utils_pyfunc(
+        function(image){
+          return(image$unmask())
+        }))
   }
 
   if(!is.null(reducer)){
 
   # Create a list of groups
-  ee_groups <-  ee$List(groups)
+  ee_groups <-  rgee::ee$List(groups)
 
   # Set filter
-  filter <- paste0("ee_layer$filter(ee$Filter$calendarRange(m, m,'", group_type,"'))$", reducer,"()")
+  filter <- paste0("ee_layer$filter(rgee::ee$Filter$calendarRange(m, m,'", group_type,"'))$", reducer,"()")
 
   # Group and reduce within groups by reducer
-  byGroup <- ee$ImageCollection$fromImages(
+  byGroup <- rgee::ee$ImageCollection$fromImages(
     ee_groups$map(
-      ee_utils_pyfunc(
+      rgee::ee_utils_pyfunc(
         function(m){
           return(eval(parse(text = filter)))
         })))

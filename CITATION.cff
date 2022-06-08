@@ -1,0 +1,157 @@
+# -----------------------------------------------------------
+# CITATION file created with {cffr} R package, v0.2.1
+# See also: https://docs.ropensci.org/cffr/
+# -----------------------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "ABAP" in publications use:'
+type: software
+license: MIT
+title: 'ABAP: Access to African Bird Atlas Project data from R'
+version: 0.0.4
+abstract: This package provides functions to access the ABAP server API and download
+  data.
+authors:
+- name: BIRDIE Development Team
+  email: f.cervantesperalta@gmail.com
+  orcid: https://orcid.org/YOUR-ORCID-ID
+preferred-citation:
+  type: manual
+  title: 'ABAP: Access to African Bird Atlas Project data from R'
+  authors:
+  - name: BIRDIE Development Team
+    email: f.cervantesperalta@gmail.com
+    orcid: https://orcid.org/YOUR-ORCID-ID
+  version: 0.0.4
+  abstract: This package provides functions to access the ABAP server API and download
+    data.
+  repository-code: https://github.com/AfricaBirdData/ABAP
+  url: https://github.com/AfricaBirdData/ABAP
+  contact:
+  - name: BIRDIE Development Team
+    email: f.cervantesperalta@gmail.com
+    orcid: https://orcid.org/YOUR-ORCID-ID
+  license: MIT
+  year: '2022'
+repository-code: https://github.com/AfricaBirdData/ABAP
+url: https://github.com/AfricaBirdData/ABAP
+contact:
+- name: BIRDIE Development Team
+  email: f.cervantesperalta@gmail.com
+  orcid: https://orcid.org/YOUR-ORCID-ID
+references:
+- type: software
+  title: data.table
+  abstract: 'data.table: Extension of `data.frame`'
+  notes: Imports
+  authors:
+  - family-names: Dowle
+    given-names: Matt
+    email: mattjdowle@gmail.com
+  - family-names: Srinivasan
+    given-names: Arun
+    email: asrini@pm.me
+  year: '2022'
+  url: https://CRAN.R-project.org/package=data.table
+- type: software
+  title: dplyr
+  abstract: 'dplyr: A Grammar of Data Manipulation'
+  notes: Imports
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@rstudio.com
+    orcid: https://orcid.org/0000-0003-4757-117X
+  - family-names: François
+    given-names: Romain
+    orcid: https://orcid.org/0000-0002-2444-4226
+  - family-names: Henry
+    given-names: Lionel
+  - family-names: Müller
+    given-names: Kirill
+    orcid: https://orcid.org/0000-0002-1416-3412
+  year: '2022'
+  url: https://CRAN.R-project.org/package=dplyr
+- type: software
+  title: httr
+  abstract: 'httr: Tools for Working with URLs and HTTP'
+  notes: Imports
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@rstudio.com
+  year: '2022'
+  url: https://CRAN.R-project.org/package=httr
+- type: software
+  title: magrittr
+  abstract: 'magrittr: A Forward-Pipe Operator for R'
+  notes: Imports
+  authors:
+  - family-names: Bache
+    given-names: Stefan Milton
+    email: stefan@stefanbache.dk
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@rstudio.com
+  year: '2022'
+  url: https://CRAN.R-project.org/package=magrittr
+- type: software
+  title: readr
+  abstract: 'readr: Read Rectangular Text Data'
+  notes: Imports
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@rstudio.com
+  - family-names: Hester
+    given-names: Jim
+  - family-names: Bryan
+    given-names: Jennifer
+    email: jenny@rstudio.com
+    orcid: https://orcid.org/0000-0002-6983-2759
+  year: '2022'
+  url: https://CRAN.R-project.org/package=readr
+- type: software
+  title: rgee
+  abstract: 'rgee: R Bindings for Calling the ''Earth Engine'' API'
+  notes: Imports
+  authors:
+  - family-names: Aybar
+    given-names: Cesar
+    email: csaybar@gmail.com
+    orcid: https://orcid.org/0000-0003-2745-9535
+  year: '2022'
+  url: https://CRAN.R-project.org/package=rgee
+- type: software
+  title: rjson
+  abstract: 'rjson: JSON for R'
+  notes: Imports
+  authors:
+  - family-names: Couture-Beil
+    given-names: Alex
+    email: rjson_pkg@mofo.ca
+  year: '2022'
+  url: https://CRAN.R-project.org/package=rjson
+- type: software
+  title: sf
+  abstract: 'sf: Simple Features for R'
+  notes: Imports
+  authors:
+  - family-names: Pebesma
+    given-names: Edzer
+    email: edzer.pebesma@uni-muenster.de
+    orcid: https://orcid.org/0000-0001-8049-7069
+  year: '2022'
+  url: https://CRAN.R-project.org/package=sf
+- type: software
+  title: 'R: A Language and Environment for Statistical Computing'
+  notes: Depends
+  authors:
+  - name: R Core Team
+  location:
+    name: Vienna, Austria
+  year: '2022'
+  url: https://www.R-project.org/
+  institution:
+    name: R Foundation for Statistical Computing
+  version: '>= 2.10'
