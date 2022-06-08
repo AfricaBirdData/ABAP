@@ -23,7 +23,7 @@ This function transforms a raw ABAP data frame (returned by \code{\link{getAbapD
 In addition to reformatting the detection/non-detection ABAP data for use in \code{unmarked}  and \code{ubms} occupancy models, this function also extracts two survey-level covariates: \code{ hours} and \code{jday}. The \code{hours} variable is the total number of hours spent atlassing which is recorded on the pentad card and \code{jday} is the Julian day corresponding to the first day of atlassing for that card. If \code{pentads} are provided the \code{unmarked} frame will add the x and y coordinates as site covariates (\code{siteCovs}). The spatial data can be used as random effects to run a restricted spatial regression (RSR) occupancy model in \code{ubms}. See \code{\link[ubms]{RSR}} for more details.
 }
 \note{
-It's important to make sure that the \code{.region_type} and \code{.region} are the same when extracting \code{abap_data} and \code{pentads} (see example below).
+It's important to make sure that the \code{.region_type} and \code{.region} are the same when extracting \code{abap_data} and \code{pentads} (see example below). The processing time of \code{abapToUnmarked_single} can be considerably long if the number of cards and pentads of the focal species is high, so patience may be required.
 }
 \examples{
 abap_single <- getAbapData(.spp_code = 212,

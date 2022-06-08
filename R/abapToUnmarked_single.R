@@ -12,7 +12,8 @@
 #'
 #' @return an object of class  \code{\link[unmarked]{unmarkedFrameOccu}}
 #'
-#' @note It's important to make sure that the `.region_type` and `.region` are the same when extracting `abap_data` and `pentads` (see example below).
+#' @note It's important to make sure that the `.region_type` and `.region` are the same when extracting `abap_data` and `pentads` (see example below). The processing time of `abapToUnmarked_single` can be considerably long if the number of cards and pentads of the focal species is high, so patience may be required.
+
 #'
 #' @seealso \code{\link[unmarked]{occu}}, \code{\link[unmarked]{occuRN}}, \code{\link[ubms]{stan_occu}}, \code{\link[ubms]{stan_occuRN}}
 #'
