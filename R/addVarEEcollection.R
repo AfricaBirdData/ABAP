@@ -66,21 +66,21 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
   }
 
   # Reduce to image
-  temp_reducer <- paste0("rgee::ee$Reducer$", temp_reducer, "()")
-  ee_layer <- ee_layer$reduce(eval(parse(text = temp_reducer)))
+  ee_temp_reducer <- paste0("rgee::ee$Reducer$", temp_reducer, "()")
+  ee_layer <- ee_layer$reduce(eval(parse(text = ee_temp_reducer)))
 
   # Extract layer values
-  spt_reducer <- paste0("rgee::ee$Reducer$", spt_reducer, "()")
+  ee_spt_reducer <- paste0("rgee::ee$Reducer$", spt_reducer, "()")
   pentads_layer <- ee_layer %>%
     rgee::ee$Image$reduceRegions(ee_pentads,
-                                 eval(parse(text = spt_reducer)),
+                                 eval(parse(text = ee_spt_reducer)),
                                  scale = scale) %>%
     rgee::ee_as_sf(via = "drive")
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){
     pentads_layer <- pentads_layer %>%
-      dplyr::rename("{bands}" := ncol(pentads_layer) - 1)
+      dplyr::rename("{bands}" := spt_reducer)
   }
 
   # This should do something similar but get problems with maxFeatures
