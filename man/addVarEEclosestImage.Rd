@@ -39,6 +39,12 @@ allowed for now.}
 computing means, counts, etc. Sometimes we might want to avoid this behaviour
 and use 0 instead of NA. If so, set unmask to TRUE.}
 }
+\value{
+A dataframe similar to \code{ee_pentads} with variables added from the
+\code{bands} selected from \code{collection}. Note that following \link\{\code{rgee}}
+the name of the new variables will be band followed by the spatial reducer
+\code{spt_reducer}.
+}
 \description{
 Each feature in a feature collection (i.e. row in asimple feature
 collection) is matched with the image in an image collection that is closest
