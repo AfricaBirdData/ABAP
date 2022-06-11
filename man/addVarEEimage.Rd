@@ -28,9 +28,9 @@ and use 0 instead of NA. If so, set unmask to TRUE.}
 }
 \value{
 A dataframe similar to \code{ee_pentads} with variables added from the
-\code{bands} selected from \code{collection}. Note that following \link\{\code{rgee}}
-the name of the new variables will be band followed by the spatial reducer
-\code{spt_reducer}.
+\code{bands} selected from \code{collection}. Note that following \href{https://github.com/r-spatial/rgee}{rgee}
+the name of the new variables will be the selected band (\code{bands} or else
+all bands from \code{collection} followed by the spatial reducer \code{spt_reducer}.
 }
 \description{
 Add variable from Google Earth Engine Image

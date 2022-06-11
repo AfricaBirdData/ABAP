@@ -22,9 +22,10 @@
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
 #' @return A dataframe similar to \code{ee_pentads} with variables added from the
-#' \code{bands} selected from \code{collection}. Note that following \link\{\code{rgee}}
-#' the name of the new variables will be band followed by the spatial reducer
-#' \code{spt_reducer}. The temporal reducer \code{temp_reducer} does not appear in the
+#' \code{bands} selected from \code{collection}. Note that following \href{https://github.com/r-spatial/rgee}{rgee}
+#' the name of the new variables will be the selected band (\code{bands} or else
+#' all bands from \code{collection} followed by the spatial reducer \code{spt_reducer}.
+#' The temporal reducer \code{temp_reducer} does not appear in the
 #' name, and therefore, it is up to the user to keep track of how the temporal
 #' reducer summarized the collection.
 #' @export
