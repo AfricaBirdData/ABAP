@@ -96,6 +96,26 @@
 #'                                        ee_data = my_ee_data)
 #' summary(umf_single_ee)
 #'
+#' ## A slightly different example:
+#' ## Annotate ABAP data with multiple bands from a GEE collection
+#' pentads_tc <- addVarEEcollection(ee_pentads = pentads,
+#'                                  collection = "IDAHO_EPSCOR/TERRACLIMATE",
+#'                                  dates = c("2010-01-01", "2011-01-01"),
+#'                                  temp_reducer = "mean",
+#'                                  spt_reducer = "mean",
+#'                                  bands = c("tmmx", "tmmn"))
+#'
+#' ## Select the variables to transfer to the unmarked frame, making sure
+#' ## 'pentad' is amongst them
+#' my_ee_data <- pentads_tc %>%
+#'     select(pentad, tmmx_mean, tmmn_mean)
+#'
+#' ## Add GEE covariates to unmarked frame
+#' umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
+#'                                         ee_data = my_ee_data])
+#'
+#' summary(umf_single_ee)
+#'
 #' }
 
 addEEtoUnmarked_single <- function(umf, ee_data) {
@@ -107,6 +127,7 @@ addEEtoUnmarked_single <- function(umf, ee_data) {
     umf_pentads <- dimnames(umf@y)[[1]]
 
     site_cov <- ee_data %>%
+        as.data.frame() %>%
         dplyr::filter(pentad %in% umf_pentads) %>%
         dplyr::arrange(match(pentad, umf_pentads)) %>%
         dplyr::select(-pentad)
