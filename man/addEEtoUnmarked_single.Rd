@@ -4,16 +4,12 @@
 \alias{addEEtoUnmarked_single}
 \title{Add Google Earth Engine covariate data to a single-season Unmarked frame}
 \usage{
-addEEtoUnmarked_single(umf, ee_data, ee_names = NULL)
+addEEtoUnmarked_single(umf, ee_data)
 }
 \arguments{
 \item{umf}{a single-season Unmarked frame containing ABAP detection/non-detection data returned by \code{\link{abapToUnmarked_single}}.}
 
-\item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}.}
-
-\item{ee_names}{a user-defined character vector giving the names of the GEE site covariates
-we want to transfer. If not provided a wild guess will be made based on what variables are
-expected to be on an ABAP dataframe.}
+\item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}. The data frame needs to contain a column called \code{pentads} with the pentad ID from data extracted using the GEE functions. The remaining columns should only contain the GEE covariate values that are intended to be added to the \code{unmarked} frame. For ease of use in occupancy model formula notation it's recommended that the variable names in the data frame are concise and informative, and don't contain spaces. See the example below for how to create this data frame after extracting GEE data.}
 }
 \value{
 an object of class \code{\link[unmarked]{unmarkedFrameOccu}} with survey and site covariates.
@@ -28,6 +24,7 @@ The numeric ranges of various GEE data can be vastly different so it is advised 
 \dontrun{
 library(rgee)
 library(unmarked)
+library(dplyr)
 
 ## Extract ABAP pentad data
 abap_pentads <- getRegionPentads(.region_type = "province",
@@ -58,7 +55,7 @@ uploadPentadsToEE(pentads = abap_pentads,
 ## Load the remote asset into R session
 pentads <- ee$FeatureCollection(assetId)
 
-## Extract mean NDVI for each pentad
+## Extract spatial mean NDVI for each pentad
 ndvi_mean <- addVarEEcollection(ee_pentads = pentads,
                                   collection = "MODIS/006/MOD13A2",
                                   dates = c("2010-01-01", "2013-01-01"),
@@ -66,30 +63,43 @@ ndvi_mean <- addVarEEcollection(ee_pentads = pentads,
                                   spt_reducer = "mean",
                                   bands = "NDVI")
 
-## Extract mean estimate of surface water occurrence for each pentad
-water_mean <- addVarEEimage(ee_pentads = pentads,
-                           image = "JRC/GSW1_3/GlobalSurfaceWater",
-                           reducer = "mean",
-                           bands = "occurrence")
+## Extract spatial standard deviation of NDVI for each pentad
+ndvi_sd <- addVarEEcollection(ee_pentads = pentads,
+                                  collection = "MODIS/006/MOD13A2",
+                                  dates = c("2010-01-01", "2013-01-01"),
+                                  temp_reducer = "mean",
+                                  spt_reducer = "stdDev",
+                                  bands = "NDVI")
 
-## Add to NDVI covariate to unmarked frame
+## Extract spatial minimum land surface temperature for each pentad
+lst_min <- addVarEEcollection(ee_pentads = pentads,
+                                 collection = "MODIS/061/MOD11A1",
+                                 dates = c("2010-01-01", "2011-01-01"),
+                                 temp_reducer = "mean",
+                                 spt_reducer = "min",
+                                 bands = "LST_Day_1km")
+
+## Extract spatial maximum land surface temperature for each pentad
+lst_max <- addVarEEcollection(ee_pentads = pentads,
+                                 collection = "MODIS/061/MOD11A1",
+                                 dates = c("2010-01-01", "2011-01-01"),
+                                 temp_reducer = "mean",
+                                 spt_reducer = "max",
+                                 bands = "LST_Day_1km")
+
+## Create a site covariate data frame for input into addEEtoUnmarked_single().
+## Note the first column is called "pentad" which is a requirement for the function to work properly.
+my_ee_data <- bind_cols(pentad = ndvi_mean$pentad,
+                     ndvi_SD = ndvi_sd$NDVI_stdDev,
+                     ndvi_MEAN = ndvi_mean$NDVI_mean,
+                     temp_MIN = lst_min$LST_Day_1km_min,
+                     temp_MAX = lst_max$LST_Day_1km_max)
+
+## Add GEE covariates to unmarked frame
 umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
-                                       ee_data = ndvi_mean,
-                                       ee_names = "NDVI_mean")
+                                       ee_data = my_ee_data)
 summary(umf_single_ee)
 
-## Add surface water covariate to unmarked frame
-umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
-                                       ee_data = water_mean,
-                                       ee_names = "water_mean")
-summary(umf_single_ee)
-
-## Add both covariates simultaneously
-umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
-                                       ee_data = water_mean,
-                                       ee_names = c("water_mean", "NDVI_mean")
-
-summary(umf_single_ee)
 }
 }
 \seealso{
