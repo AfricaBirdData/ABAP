@@ -112,7 +112,7 @@
 #'
 #' ## Add GEE covariates to unmarked frame
 #' umf_single_ee <- addEEtoUnmarked_single(umf = umf_single,
-#'                                         ee_data = my_ee_data])
+#'                                         ee_data = my_ee_data)
 #'
 #' summary(umf_single_ee)
 #'
