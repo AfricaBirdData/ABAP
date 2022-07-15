@@ -128,6 +128,7 @@ addEEtoUnmarked_single <- function(umf, ee_data) {
 
     site_cov <- ee_data %>%
         as.data.frame() %>%
+        dplyr::select(-any_of("geometry")) %>%
         dplyr::filter(pentad %in% umf_pentads) %>%
         dplyr::arrange(match(pentad, umf_pentads)) %>%
         dplyr::select(-pentad)
