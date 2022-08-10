@@ -18,7 +18,12 @@
 #' computing means, counts, etc. Sometimes we might want to avoid this behaviour
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
-#' @return
+#' @return This function transforms an image collection made of a number of images,
+#' each representing a variable at different times (e.g. NDVI measures in different
+#' months) into a multiband image. Each band in the new image represent a different
+#' time. The advantage of a multiband image over an image collection is that we can
+#' annotate data with all the bands of an image on a single function call, saving
+#' time and data traffic between our machine and GEE servers.
 #' @export
 #'
 #' @examples
@@ -31,6 +36,11 @@
 #'                                      groups = 2008:2019,
 #'                                      reducer = "mean",
 #'                                      unmask = FALSE)
+#'
+#' Find mean (mean) NDVI for each pentad and year
+#' ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+#' pentads_ndvi <- addVarEEimage(ee_data, multiband, "mean")
+#'
 #' }
 EEcollectionToMultiband <- function(collection, dates, band,
                                     group_type, groups,
@@ -55,7 +65,7 @@ EEcollectionToMultiband <- function(collection, dates, band,
 
   # Remove missing values (this will depend on the layer)
   if(unmask){
-    ee_layer <- rgee::ee_layer$map(
+    ee_layer <- ee_layer$map(
       rgee::ee_utils_pyfunc(
         function(image){
           return(image$unmask())

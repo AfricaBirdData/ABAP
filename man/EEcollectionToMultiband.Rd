@@ -39,6 +39,14 @@ applying any reduction (each image goes to a band).}
 computing means, counts, etc. Sometimes we might want to avoid this behaviour
 and use 0 instead of NA. If so, set unmask to TRUE.}
 }
+\value{
+This function transforms an image collection made of a number of images,
+each representing a variable at different times (e.g. NDVI measures in different
+months) into a multiband image. Each band in the new image represent a different
+time. The advantage of a multiband image over an image collection is that we can
+annotate data with all the bands of an image on a single function call, saving
+time and data traffic between our machine and GEE servers.
+}
 \description{
 Convert a GEE collection to multiband image
 }
@@ -52,5 +60,10 @@ multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
                                      groups = 2008:2019,
                                      reducer = "mean",
                                      unmask = FALSE)
+
+Find mean (mean) NDVI for each pentad and year
+ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+pentads_ndvi <- addVarEEimage(ee_data, multiband, "mean")
+
 }
 }
