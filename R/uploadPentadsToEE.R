@@ -79,6 +79,19 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
                    via = "getInfo_to_asset")
   }
 
+  # check that the asset has been produced and wait longer otherwise
+  assets <- rgee::ee_manage_assetlist(rgee::ee_get_assethome())
+
+  try = 1
+  while(!asset_id %in% assets$ID && try < 10){
+      message(paste("Checking GEE counts status", try+1, "of 10"))
+      Sys.sleep(60)
+      assets <- rgee::ee_manage_assetlist(rgee::ee_get_assethome())
+      try = try + 1
+  }
+
+  message(paste("Asset", asset_id, "created"))
+
   # Load if required
   if(load){
     out <- rgee::ee$FeatureCollection(asset_id)

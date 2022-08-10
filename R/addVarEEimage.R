@@ -15,7 +15,10 @@
 #' computing means, counts, etc. Sometimes we might want to avoid this behaviour
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
-#' @return
+#' @return A dataframe similar to \code{ee_pentads} with variables added from the
+#' \code{bands} selected from \code{collection}. Note that following \href{https://github.com/r-spatial/rgee}{rgee}
+#' the name of the new variables will be the selected band (\code{bands} or else
+#' all bands from \code{collection} followed by the spatial reducer \code{reducer}.
 #' @export
 #'
 #' @examples
@@ -64,8 +67,12 @@ addVarEEimage <- function(ee_pentads, image, reducer,
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){
-    pentads_layer <- pentads_layer %>%
-        dplyr::rename("{bands}" := reducer)
+
+      layer_name <- paste0(bands, "_", reducer)
+
+      pentads_layer <- pentads_layer %>%
+          dplyr::rename("{layer_name}" := reducer)
+
   }
 
   # This should do something similar but get problems with maxFeatures
