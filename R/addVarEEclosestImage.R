@@ -23,7 +23,10 @@
 #' computing means, counts, etc. Sometimes we might want to avoid this behaviour
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
-#' @return
+#' @return A dataframe similar to \code{ee_pentads} with variables added from the
+#' \code{bands} selected from \code{collection}. Note that following \href{https://github.com/r-spatial/rgee}{rgee}
+#' the name of the new variables will be the selected band (\code{bands} or else
+#' all bands from \code{collection} followed by the spatial reducer \code{reducer}.
 #' @export
 #'
 #' @examples
