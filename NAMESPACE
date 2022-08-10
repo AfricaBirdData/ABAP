@@ -2,10 +2,11 @@
 
 export("%>%")
 export(EEcollectionToMultiband)
-export(abapTo)
 export(abapToSpOcc_single)
 export(abapToUnmarked_multi)
 export(abapToUnmarked_single)
+export(addEEtoSpOcc_single)
+export(addEEtoUnmarked_multi)
 export(addEEtoUnmarked_single)
 export(addVarEEclosestImage)
 export(addVarEEcollection)

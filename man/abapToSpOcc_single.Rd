@@ -11,23 +11,52 @@ abapToSpOcc_single(abap_data, pentads = NULL, proj_coords = TRUE)
 
 \item{pentads}{an \code{sf} object returned by \code{\link{getRegionPentads}}. Defaults to \code{NULL}.}
 
-\item{proj_coords}{logical value indicating whether pentad coordinates are projected (\code{TRUE}) or kept in decimal degree format (\code{FALSE}). Defaults to \code{TRUE}. See details below for coordinate reference system used during transformation.}
+\item{proj_coords}{logical value indicating whether pentad coordinates are
+projected (\code{TRUE}) or kept in decimal degree format (\code{FALSE}). Defaults to \code{TRUE}.
+See details below for coordinate reference system used during transformation.}
 }
 \value{
-A list containing data necessary for model fitting in \code{spOccupancy}. List elements are \code{y} (detection/non-detection data), \code{det.covs} (survey-level covariates), and \code{coords} (x and y centroids of pentads if spatial data are supplied).
+A list containing data necessary for model fitting in \code{spOccupancy}.
+List elements are \code{y} (detection/non-detection data), \code{det.covs} (survey-level covariates),
+and \code{coords} (x and y centroids of pentads if spatial data are supplied).
 }
 \description{
-This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}}) into an list which can be used to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial). The \code{spOccupancy} package fits single-species, multi-species, and integrated non-spatial and spatial occupancy models using Markov Chain Monte Carlo (MCMC).
+This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}})
+into an list which can be used to fit single-species occupancy models using
+\code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}}
+(non-spatial). The \code{spOccupancy} package fits single-species, multi-species,
+and integrated non-spatial and spatial occupancy models using Markov Chain Monte Carlo (MCMC).
 }
 \details{
-The \code{\link[spOccupancy]{spPGOcc}} function takes \code{coords} as an argument with X and Y coordinates included for each site. Within the context of ABAP, these \code{coords} are the centroid of each sampling pentad. In order to provide these spatial data to this function, simply use \code{\link{getRegionPentads}} and provide the same inputs for \code{.region_type} and \code{.region} that are specified in corresponding \code{\link{getAbapData}} call. If proj_coords is set to \code{TRUE} then the coordinates will be transformed using the African Albers Equal Area coordinate system (see \href{https://spatialreference.org/ref/esri/africa-albers-equal-area-conic/}{here} for details). This projection is best suited for land masses extending in an east-to-west orientation at mid-latitudes making it suitable for projecting pentads in Southern Africa. The functions in the \code{spOccupancy} package assume that coordinates are projected so for best results it is recommended to always project the data. \cr
+The \code{\link[spOccupancy]{spPGOcc}} function takes \code{coords} as an
+argument with X and Y coordinates included for each site. Within the context
+of ABAP, these \code{coords} are the centroid of each sampling pentad. In order to
+provide these spatial data to this function, simply use \code{\link{getRegionPentads}}
+and provide the same inputs for \code{.region_type} and \code{.region} that are specified
+in corresponding \code{\link{getAbapData}} call. If proj_coords is set to \code{TRUE}
+then the coordinates will be transformed using the African Albers Equal Area
+coordinate system (see \href{https://spatialreference.org/ref/esri/africa-albers-equal-area-conic/}{here}
+for details). This projection is best suited for land masses extending in an
+east-to-west orientation at mid-latitudes making it suitable for projecting
+pentads in Southern Africa. The functions in the \code{spOccupancy} package assume
+that coordinates are projected so for best results it is recommended to always
+project the data. \cr
 
-If \code{pentads} are specified then the output can be automatically used in \code{\link[spOccupancy]{spPGOcc}}. If no spatial data are provided the output can be used in \code{\link[spOccupancy]{PGOcc}}.\cr
+If \code{pentads} are specified then the output can be automatically used in
+\code{\link[spOccupancy]{spPGOcc}}. If no spatial data are provided the output
+can be used in \code{\link[spOccupancy]{PGOcc}}.\cr
 
-In addition to reformatting the detection/non-detection ABAP data for use in \code{spOccupancy} occupancy models, this function also extracts two survey-level covariates and adds them to the output list: \code{ hours} and \code{jday}. The \code{hours} variable is the total number of hours spent atlassing which is recorded on the pentad card and \code{jday} is the Julian day corresponding to the first day of atlassing for that card.
+In addition to reformatting the detection/non-detection ABAP data for use in
+\code{spOccupancy} occupancy models, this function also extracts two survey-level
+covariates and adds them to the output list: \code{ hours} and \code{jday}. The \code{hours}
+variable is the total number of hours spent atlassing which is recorded on the
+pentad card and \code{jday} is the Julian day corresponding to the first day of
+atlassing for that card.
 }
 \note{
-The processing time of \code{abapToSpOcc_single} can be considerably long if the number of cards and pentads of the focal species is high, so patience may be required.
+The processing time of \code{abapToSpOcc_single} can be considerably long if
+the number of cards and pentads of the focal species is high, so patience may
+be required.
 }
 \examples{
 abap_data <- getAbapData(.spp_code = 212,

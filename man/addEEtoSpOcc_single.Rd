@@ -7,15 +7,30 @@
 addEEtoSpOcc_single(spOcc, ee_data)
 }
 \arguments{
-\item{spOcc}{a list containing ABAP detection/non-detection data returned by \code{\link{abapToSpOcc_single}}.}
+\item{spOcc}{a list containing ABAP detection/non-detection data returned by
+\code{\link{abapToSpOcc_single}}.}
 
-\item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}. The data frame needs to contain a column called \code{pentads} with the pentad ID from data extracted using the GEE functions. The remaining columns should only contain the GEE covariate values that are intended to be added to the \code{spOccupancy} list. For ease of use in occupancy model formula notation it's recommended that the variable names in the data frame are concise and informative, and don't contain spaces. See the example below for how to create this data frame after extracting GEE data.}
+\item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}}
+or \code{\link{addVarEEimage}}. The data frame needs to contain a column called
+\code{pentads} with the pentad ID from data extracted using the GEE functions.
+The remaining columns should only contain the GEE covariate values that are
+intended to be added to the \code{spOccupancy} list. For ease of use in occupancy
+model formula notation it's recommended that the variable names in the data
+frame are concise and informative, and don't contain spaces. See the example
+below for how to create this data frame after extracting GEE data.}
 }
 \description{
-Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. \code{addEEtoSpOcc_single} can then be used to add these types of data to a list in order to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}} (spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial) from the \code{spOccupancy} package.
+Google Earth Engine (GEE) data for each pentad can be extracted
+to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}}
+functions. \code{addEEtoSpOcc_single} can then be used to add these types of data
+to a list in order to fit single-species occupancy models using \code{\link[spOccupancy]{spPGOcc}}
+(spatial) or \code{\link[spOccupancy]{PGOcc}} (non-spatial) from the \code{spOccupancy}
+package.
 }
 \note{
-The numeric ranges of various GEE data can be vastly different so it is advised that you scale your covariate data before running an occupancy model. See the example below for how to do this.
+The numeric ranges of various GEE data can be vastly different so it
+is advised that you scale your covariate data before running an occupancy
+model. See the example below for how to do this.
 }
 \examples{
 \dontrun{
@@ -84,14 +99,15 @@ lst_max <- addVarEEcollection(ee_pentads = pentads,
                                  bands = "LST_Day_1km")
 
 ## Create a site covariate data frame for input into addEEtoSpOcc_single().
-## Note the first column is called "pentad" which is a requirement for the function to work properly.
+## Note the first column is called "pentad" which is a requirement for the
+## function to work properly.
 my_ee_data <- bind_cols(pentad = ndvi_mean$pentad,
                      ndvi_SD = ndvi_sd$NDVI_stdDev,
                      ndvi_MEAN = ndvi_mean$NDVI_mean,
                      temp_MIN = lst_min$LST_Day_1km_min,
                      temp_MAX = lst_max$LST_Day_1km_max)
 
-## Add GEE covariates to unmarked frame
+## Add GEE covariates to spOcc list
 spOcc_single_ee <- addEEtoSpOcc_single(spOcc = spOcc_single,
                                      ee_data = my_ee_data)
 str(spOcc_single_ee)
@@ -112,12 +128,12 @@ pentads_tc <- addVarEEcollection(ee_pentads = pentads,
                                  spt_reducer = "mean",
                                  bands = c("tmmx", "tmmn"))
 
-## Select the variables to transfer to the unmarked frame, making sure
+## Select the variables to transfer to the spOcc list, making sure
 ## 'pentad' is amongst them
 my_ee_data <- pentads_tc \%>\%
     select(pentad, tmmx_mean, tmmn_mean)
 
-## Add GEE covariates to unmarked frame
+## Add GEE covariates to spOcc list
 spOcc_single_ee <- addEEtoSpOcc_single(spOcc = spOcc_single,
                                      ee_data = my_ee_data)
 
@@ -126,7 +142,9 @@ str(spOcc_single_ee)
 }
 }
 \seealso{
-\code{\link{abapToSpOcc_single}}, \code{\link[spOccupancy]{spPGOcc}}, \code{\link[spOccupancy]{PGOcc}}, \code{\link{addVarEEimage}}, \code{\link{addVarEEcollection}}
+\code{\link{abapToSpOcc_single}}, \code{\link[spOccupancy]{spPGOcc}},
+\code{\link[spOccupancy]{PGOcc}}, \code{\link{addVarEEimage}},
+\code{\link{addVarEEcollection}}
 }
 \author{
 Dominic Henry \href{mailto:dominic.henry@gmail.com}{dominic.henry@gmail.com} \cr

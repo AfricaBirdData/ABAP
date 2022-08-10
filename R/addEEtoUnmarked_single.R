@@ -120,6 +120,11 @@
 
 addEEtoUnmarked_single <- function(umf, ee_data) {
 
+    if(!requireNamespace("unmarked", quietly = TRUE)) {
+        stop("Package unmarked doesn't seem to be installed. Please install before using this function.",
+             call. = FALSE)
+    }
+
     if(isFALSE("pentad" %in% names(ee_data))){
         stop("ee_data does not contain the required 'pentad' variable. See function documentation.")
     }

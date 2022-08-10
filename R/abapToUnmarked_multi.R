@@ -1,19 +1,33 @@
 #' ABAP to unmarked (multi-season)
 #'
-#' @description This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}}) into an \code{\link[unmarked]{unmarkedMultFrame}} object which can be used to fit dynamic occupancy models using \code{\link[unmarked]{colext}} (MacKenzie et. al 2003) and \code{\link[ubms]{stan_colext}} from the `ubms` package (which fits Unmarked Bayesian Models with Stan).
+#' @description This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}})
+#' into an \code{\link[unmarked]{unmarkedMultFrame}} object which can be used to
+#' fit dynamic occupancy models using \code{\link[unmarked]{colext}} (MacKenzie et. al 2003)
+#' and \code{\link[ubms]{stan_colext}} from the `ubms` package (which fits
+#' Unmarked Bayesian Models with Stan).
 #'
 #' @param abap_data multi-season ABAP data downloaded using \code{\link{getAbapData}}.
-#' @param pentads an `sf` object returned by \code{\link{getRegionPentads}}. Defaults to `NULL`.
+#' @param pentads an `sf` object returned by \code{\link{getRegionPentads}}.
+#' Defaults to `NULL`.
 #'
 #' @return an object of class \code{\link[unmarked]{unmarkedMultFrame}}
 #'
-#' @details In addition to reformatting the detection/non-detection ABAP data for use in `unmarked` and `ubms` occupancy models, this function also extracts two survey-level covariates: `hours` and `jday`. The `hours` variable is the total number of hours spent atlassing which is recorded on the pentad card and `jday` is the Julian day corresponding to the first day of atlassing for that card.\cr
+#' @details In addition to reformatting the detection/non-detection ABAP data for
+#' use in `unmarked` and `ubms` occupancy models, this function also extracts two
+#' survey-level covariates: `hours` and `jday`. The `hours` variable is the total
+#' number of hours spent atlassing which is recorded on the pentad card and `jday`
+#' is the Julian day corresponding to the first day of atlassing for that card.\cr
 #'
-#' The function also adds the sampling year as a `yearlySiteCovs` which allows year to be used in the formula for colonization, extinction and detection probability.\cr
+#' The function also adds the sampling year as a `yearlySiteCovs` which allows
+#' year to be used in the formula for colonization, extinction and detection
+#' probability.\cr
 #'
-#' If `pentads` are provided the `unmarked` frame will add the X and Y coordinates as site-level covariates (`siteCovs`).
+#' If `pentads` are provided the `unmarked` frame will add the X and Y coordinates
+#' as site-level covariates (`siteCovs`).
 #'
-#' @note The processing time of `abapToUnmarked_multi` can be considerably long if the number of cards and pentads of the focal species is high, so patience may be required.
+#' @note The processing time of `abapToUnmarked_multi` can be considerably long
+#' if the number of cards and pentads of the focal species is high, so patience
+#' may be required.
 
 #'
 #' @seealso \code{\link[unmarked]{colext}}, \code{\link[ubms]{stan_colext}}
@@ -22,11 +36,14 @@
 #' Pachi Cervantes
 #'
 #' @references
-#' MacKenzie, D. I., J. D. Nichols, J. E. Hines, M. G. Knutson, and A. B. Franklin. 2003. Estimating site occupancy, colonization, and local extinction when a species is detected imperfectly. Ecology 84:2200-2207.
+#' MacKenzie, D. I., J. D. Nichols, J. E. Hines, M. G. Knutson, and A. B.
+#' Franklin. 2003. Estimating site occupancy, colonization, and local extinction
+#' when a species is detected imperfectly. Ecology 84:2200-2207.
 #'
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' library(unmarked)
 #' abap_multi <- getAbapData(.spp = 212,
 #'                           .region_type = "province",
@@ -43,7 +60,13 @@
 #' ## Return unmarked frame with Pentad coordinates as site covariates
 #' um_df <- abapToUnmarked_multi(abap_data = abap_multi, pentads = abap_pentads)
 #' summary(um_df)
+#' }
 abapToUnmarked_multi <- function(abap_data, pentads = NULL){
+
+    if(!requireNamespace("unmarked", quietly = TRUE)) {
+        stop("Package unmarked doesn't seem to be installed. Please install before using this function.",
+            call. = FALSE)
+    }
 
     abap_data <- abap_data %>%
         dplyr::mutate(year = lubridate::year(StartDate))

@@ -7,27 +7,56 @@
 addEEtoUnmarked_multi(umf, ee_assign, ee_data)
 }
 \arguments{
-\item{umf}{a multi-season \code{unmarked} frame containing ABAP detection/non-detection data returned by \code{\link{abapToUnmarked_multi}}.}
+\item{umf}{a multi-season \code{unmarked} frame containing ABAP detection/non-detection
+data returned by \code{\link{abapToUnmarked_multi}}.}
 
-\item{ee_assign}{"site" if the covariate only varies between sites or "site-year" if the covariate varies across sites and between years.}
+\item{ee_assign}{"site" if the covariate only varies between sites or "site-year"
+if the covariate varies across sites and between years.}
 
-\item{ee_data}{if \code{ee_assign} = "site" then a user-formatted data frame with GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}. If \code{ee_assign} = "site-year" then the input is user-formatted list where each element contains a GEE variable that varies across years. See details below for the formatting requirements of \code{ee_data}.}
+\item{ee_data}{if \code{ee_assign} = "site" then a user-formatted data frame with
+GEE data extracted using \code{\link{addVarEEcollection}} or \code{\link{addVarEEimage}}.
+If \code{ee_assign} = "site-year" then the input is user-formatted list where each
+element contains a GEE variable that varies across years. See details below
+for the formatting requirements of \code{ee_data}.}
 }
 \value{
-an object of class \code{\link[unmarked]{unmarkedMultFrame}} with survey, site, and site-year covariates.
+an object of class \code{\link[unmarked]{unmarkedMultFrame}} with
+survey, site, and site-year covariates.
 }
 \description{
-Google Earth Engine (GEE) data for each pentad can be extracted to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}} functions. \code{addEEtoUnmarked_multi} can then be used to add these types of data to a multi-season Unmarked frame. In multi-season (dynamic) occupancy models, the GEE data can either be used as covariates that vary at the site (\code{siteCovs}) level or covariates that vary at the site-year level (\code{yearlySiteCovs}). More information on this data structure can be found by looking at \code{\link[unmarked]{unmarkedMultFrame}}.
+Google Earth Engine (GEE) data for each pentad can be extracted
+to a data frame using ABAP's \code{\link{addVarEEcollection}} and \code{\link{addVarEEimage}}
+functions. \code{addEEtoUnmarked_multi} can then be used to add these types of
+data to a multi-season Unmarked frame. In multi-season (dynamic) occupancy
+models, the GEE data can either be used as covariates that vary at the site
+(\code{siteCovs}) level or covariates that vary at the site-year level (\code{yearlySiteCovs}).
+More information on this data structure can be found by looking at
+\code{\link[unmarked]{unmarkedMultFrame}}.
 }
 \details{
-The data frame used when \code{ee_assign} = "site" needs to contain a column called \code{pentads} with the pentad ID from data extracted using the GEE functions. The remaining columns should only contain the GEE covariate values that are intended to be added to the \code{unmarked} frame. For ease of use in occupancy model formula notation it's recommended that the variable names in the data frame are concise and informative, and don't contain spaces.  \cr
+The data frame used when \code{ee_assign} = "site" needs to contain a
+column called \code{pentads} with the pentad ID from data extracted using the GEE
+functions. The remaining columns should only contain the GEE covariate values
+that are intended to be added to the \code{unmarked} frame. For ease of use in
+occupancy model formula notation it's recommended that the variable names
+in the data frame are concise and informative, and don't contain spaces.  \cr
 
-Each element in the list used when \code{ee_assign} = "site-year" is a data frame that needs to have a column called \code{pentads} with the pentad ID followed by a GEE variable column for each year (primary survey period) defined in the \code{\link{abapToUnmarked_multi}} call. \cr
+Each element in the list used when \code{ee_assign} = "site-year" is a data frame
+that needs to have a column called \code{pentads} with the pentad ID followed by a
+GEE variable column for each year (primary survey period) defined in the
+\code{\link{abapToUnmarked_multi}} call. \cr
 
-See the examples below for how to create these  data frame and list \code{ee_data} objects after extracting GEE data.
+See the examples below for how to create these  data frame and list \code{ee_data}
+objects after extracting GEE data.
 }
 \note{
-The numeric ranges of various GEE data can be vastly different so it is advised that you scale your covariate data before running an occupancy model. This can be done within the formula notation of the \code{\link[unmarked]{colext}} function. Note that \code{year} is automatically added as a site-year covariate in order to model changes in colonisation/extinction purely as a function of year (in terms of notation, the first year is coded as \code{01}, the second year as \code{02}, etc).
+The numeric ranges of various GEE data can be vastly different so it
+is advised that you scale your covariate data before running an occupancy
+model. This can be done within the formula notation of the \code{\link[unmarked]{colext}}
+function. Note that \code{year} is automatically added as a site-year covariate
+in order to model changes in colonisation/extinction purely as a function of
+year (in terms of notation, the first year is coded as \code{01}, the second year
+as \code{02}, etc).
 }
 \examples{
 \dontrun{
@@ -160,7 +189,8 @@ summary(umf_multi_ee4)
  }
 }
 \seealso{
-\code{\link{abapToUnmarked_multi}}, \code{\link{addVarEEimage}}, \code{\link{addVarEEcollection}}
+\code{\link{abapToUnmarked_multi}}, \code{\link{addVarEEimage}},
+\code{\link{addVarEEcollection}}
 }
 \author{
 Dominic Henry \href{mailto:dominic.henry@gmail.com}{dominic.henry@gmail.com} \cr
