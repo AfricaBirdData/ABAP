@@ -103,42 +103,42 @@ abapToSpOcc_single <- function(abap_data, pentads = NULL, proj_coords = TRUE){
             sf::st_coordinates()
     }
 
-    ## Create empty arrays
-    Y <-  array(NA, dim = c(n_sites, max_visits),
-                dimnames = list(pentad_id, NULL))
+    # Aux padding vector
+    vpad <- rep(NA, max_visits)
 
-    obs_hours <-  array(NA, dim = c(n_sites, max_visits),
-                        dimnames = list(pentad_id, NULL))
+    ## Create detection histories
+    det_hist <- abap_data %>%
+        dplyr::select(Pentad, Spp) %>%
+        dplyr::mutate(Spp = ifelse(Spp == "-", 0L, 1L)) %>%
+        dplyr::nest_by(Pentad)
 
-    obs_jday <-  array(NA, dim = c(n_sites, max_visits),
-                       dimnames = list(pentad_id, NULL))
+    det_hist <- det_hist %>%
+        dplyr::mutate(dets = list(head(c(data$Spp, vpad), max_visits)))
 
-    ## Populate detection/non-detection array (Y) and survey covariate arrays
-    for(i in seq_len(n_sites)){
+    Y <- do.call("rbind", det_hist$dets)
+    rownames(Y) <- pentad_id
 
-        dnd_vec <- abap_data %>%
-            dplyr::filter(Pentad == pentad_id[i]) %>%
-            dplyr::pull(Spp)
+    ## Extract total hours
+    obs_hours <- abap_data %>%
+        dplyr::select(Pentad, TotalHours) %>%
+        dplyr::nest_by(Pentad) %>%
+        dplyr::mutate(hourpad = list(head(c(data$TotalHours, vpad), max_visits)))
 
-        dnd_vec <- dplyr::case_when(dnd_vec == "-" ~ 0,
-                                    TRUE ~ 1)
+    obs_hours <- do.call("rbind", obs_hours$hourpad)
+    rownames(obs_hours) <- pentad_id
 
-        Y[i, seq_along(dnd_vec)] <- dnd_vec
+    ## Extract Julian day
+    obs_jday <- abap_data %>%
+        dplyr::mutate(julian_day = lubridate::yday(StartDate)) %>%
+        dplyr::select(Pentad, julian_day) %>%
+        dplyr::nest_by(Pentad) %>%
+        dplyr::mutate(jdaypad = list(head(c(data$julian_day, vpad), max_visits)))
 
-        total_hours <- abap_data %>%
-            dplyr::filter(Pentad == pentad_id[i]) %>%
-            dplyr::pull(TotalHours)
+    obs_jday <- do.call("rbind", obs_jday$jdaypad)
+    rownames(obs_jday) <- pentad_id
 
-        obs_hours[i, seq_along(total_hours)] <- total_hours
+    # Need to add dimnames
 
-        jday <- abap_data %>%
-            dplyr::filter(Pentad == pentad_id[i]) %>%
-            dplyr::mutate(julian_day = lubridate::yday(StartDate)) %>%
-            dplyr::pull(julian_day)
-
-        obs_jday[i, seq_along(jday)] <- jday
-
-    }
 
     if(!is.null(pentads)){
 
