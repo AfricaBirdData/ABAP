@@ -114,6 +114,14 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
   out <- best_matches$map(add_value) %>%
     rgee::ee_as_sf(via = 'drive')
 
+  # Fix names and variables
+  layer_name <- paste0(bands, "_", reducer)
+
+  out <- out %>%
+      dplyr::rename_with(~gsub("val", layer_name, .x), .cols = dplyr::starts_with("val")) %>%
+      dplyr::select(-c(id, date_millis, bestImage)) %>%
+      dplyr::select(dplyr::everything(), DateTimeImage)
+
   return(out)
 
 }
