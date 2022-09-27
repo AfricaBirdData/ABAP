@@ -97,6 +97,7 @@ abapToSpOcc_single <- function(abap_data, pentads = NULL, proj_coords = TRUE){
 
         pentad_xy <- pentads %>%
             dplyr::filter(pentad %in% pentad_id) %>%
+            dplyr::arrange(pentad) %>%
             sf::st_centroid() %>%
             sf::st_coordinates()
     }
@@ -110,6 +111,7 @@ abapToSpOcc_single <- function(abap_data, pentads = NULL, proj_coords = TRUE){
         dplyr::mutate(Spp = ifelse(Spp == "-", 0L, 1L),
                       julian_day = lubridate::yday(StartDate)) %>%
         dplyr::nest_by(Pentad) %>%
+        dplyr::arrange(Pentad) %>%
         dplyr::mutate(hourpad = list(head(c(data$TotalHours, vpad), max_visits)),
                       jdaypad = list(head(c(data$julian_day, vpad), max_visits)))
 
