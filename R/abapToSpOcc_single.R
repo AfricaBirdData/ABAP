@@ -80,8 +80,6 @@ abapToSpOcc_single <- function(abap_data, pentads = NULL, proj_coords = TRUE){
 
     pentad_id <- unique(abap_data$Pentad)
 
-    n_sites <- length(pentad_id)
-
     max_visits <- abap_data %>%
         dplyr::count(Pentad) %>%
         dplyr::pull(n) %>%
@@ -106,39 +104,29 @@ abapToSpOcc_single <- function(abap_data, pentads = NULL, proj_coords = TRUE){
     # Aux padding vector
     vpad <- rep(NA, max_visits)
 
-    ## Create detection histories
-    det_hist <- abap_data %>%
-        dplyr::select(Pentad, Spp) %>%
-        dplyr::mutate(Spp = ifelse(Spp == "-", 0L, 1L)) %>%
-        dplyr::nest_by(Pentad)
+    ## Create dataframe to format
+    format_df <- abap_data %>%
+        dplyr::select(Pentad, Spp, TotalHours, StartDate) %>%
+        dplyr::mutate(Spp = ifelse(Spp == "-", 0L, 1L),
+                      julian_day = lubridate::yday(StartDate)) %>%
+        dplyr::nest_by(Pentad) %>%
+        dplyr::mutate(hourpad = list(head(c(data$TotalHours, vpad), max_visits)),
+                      jdaypad = list(head(c(data$julian_day, vpad), max_visits)))
 
-    det_hist <- det_hist %>%
+    ## Extract detection histories
+    det_hist <- format_df %>%
         dplyr::mutate(dets = list(head(c(data$Spp, vpad), max_visits)))
 
     Y <- do.call("rbind", det_hist$dets)
-    rownames(Y) <- pentad_id
+    rownames(Y) <- format_df$Pentad
 
     ## Extract total hours
-    obs_hours <- abap_data %>%
-        dplyr::select(Pentad, TotalHours) %>%
-        dplyr::nest_by(Pentad) %>%
-        dplyr::mutate(hourpad = list(head(c(data$TotalHours, vpad), max_visits)))
-
-    obs_hours <- do.call("rbind", obs_hours$hourpad)
-    rownames(obs_hours) <- pentad_id
+    obs_hours <- do.call("rbind", format_df$hourpad)
+    rownames(obs_hours) <- format_df$Pentad
 
     ## Extract Julian day
-    obs_jday <- abap_data %>%
-        dplyr::mutate(julian_day = lubridate::yday(StartDate)) %>%
-        dplyr::select(Pentad, julian_day) %>%
-        dplyr::nest_by(Pentad) %>%
-        dplyr::mutate(jdaypad = list(head(c(data$julian_day, vpad), max_visits)))
-
-    obs_jday <- do.call("rbind", obs_jday$jdaypad)
-    rownames(obs_jday) <- pentad_id
-
-    # Need to add dimnames
-
+    obs_jday <- do.call("rbind", format_df$jdaypad)
+    rownames(obs_jday) <- format_df$Pentad
 
     if(!is.null(pentads)){
 
