@@ -154,7 +154,7 @@ addEEtoSpOcc_single <- function(spOcc, ee_data) {
 
     site_cov <- ee_data %>%
         as.data.frame() %>%
-        dplyr::select(-any_of("geometry")) %>%
+        dplyr::select(-dplyr::any_of("geometry")) %>%
         dplyr::filter(pentad %in% spOcc_pentads) %>%
         dplyr::arrange(match(pentad, spOcc_pentads)) %>%
         dplyr::select(-pentad)
