@@ -61,7 +61,7 @@
 #' um_df <- abapToUnmarked_multi(abap_data = abap_multi, pentads = abap_pentads)
 #' summary(um_df)
 #' }
-abapToUnmarked_multi <- function(abap_data, pentads = NULL){
+abapToUnmarked_multi_v2 <- function(abap_data, pentads = NULL){
 
     if(!requireNamespace("unmarked", quietly = TRUE)) {
         stop("Package unmarked doesn't seem to be installed. Please install before using this function.",
@@ -96,6 +96,7 @@ abapToUnmarked_multi <- function(abap_data, pentads = NULL){
 
         pentad_xy <- pentads %>%
             dplyr::filter(pentad %in% pentad_id) %>%
+            dplyr::arrange(pentad) %>%
             sf::st_centroid() %>%
             sf::st_coordinates() %>%
             as.data.frame() %>%
@@ -119,50 +120,58 @@ abapToUnmarked_multi <- function(abap_data, pentads = NULL){
     ## Populate detection/non-detection array (Y) and survey covariate arrays
     # Y[sites, visits, years]
 
+    # Aux pentad column to join yearly results
+    pentad_col <- abap_data %>%
+        dplyr::group_by(Pentad) %>%
+        dplyr::summarise(Pentad = unique(Pentad)) %>%
+        dplyr::arrange(Pentad)
+
+
+    # Aux padding vector
+    vpad <- rep(NA, max_visits)
+
     for(k in seq_along(years_vec)){
 
+        ## Create dataframe to format
         year_data <- abap_data %>%
-            dplyr::filter(year == years_vec[k])
+            dplyr::filter(year == years_vec[k]) %>%
+            dplyr::select(Pentad, Spp, TotalHours, StartDate) %>%
+            dplyr::mutate(Spp = ifelse(Spp == "-", 0L, 1L),
+                          julian_day = lubridate::yday(StartDate)) %>%
+            dplyr::right_join(pentad_col, by = "Pentad") %>%      # Join in Pentads missing for the year
+            dplyr::nest_by(Pentad) %>%
+            dplyr::arrange(Pentad) %>%
+            dplyr::mutate(hourpad = list(head(c(data$TotalHours, vpad), max_visits)),
+                          jdaypad = list(head(c(data$julian_day, vpad), max_visits)))
 
-        for(i in seq_len(n_sites)){
+        # Join in Pentads missing for the year
+        # year_data <- pentad_col %>%
+        #     dplyr::left_join(year_data, by = "Pentad")
 
-            dnd_vec <- year_data %>%
-                dplyr::filter(Pentad == pentad_id[i]) %>%
-                dplyr::pull(Spp)
+        ## Extract detection histories
+        det_hist <- year_data %>%
+            dplyr::mutate(dets = list(head(c(data$Spp, vpad), max_visits))) %>%
+            dplyr::select(Pentad, dets)
 
-            if(length(dnd_vec) == 0){
-                next
-            }
+        Y[,,k] <- do.call("rbind", det_hist$dets)
 
-            dnd_vec <- dplyr::case_when(dnd_vec == "-" ~ 0,
-                                        TRUE ~ 1)
+        ## Extract total hours
+        obs_hours[,,k] <- do.call("rbind", year_data$hourpad)
 
-            Y[i, seq_along(dnd_vec), k] <- dnd_vec
+        ## Extract Julian day
+        obs_jday[,,k] <- do.call("rbind", year_data$jdaypad)
 
-            # Add number of hours and Julian day
-            total_hours <- year_data %>%
-                dplyr::filter(Pentad == pentad_id[i]) %>%
-                dplyr::pull(TotalHours)
-
-            obs_hours[i, seq_along(total_hours), k] <- total_hours
-
-            jday <- year_data %>%
-                dplyr::filter(Pentad == pentad_id[i]) %>%
-                dplyr::mutate(julian_day = lubridate::yday(StartDate)) %>%
-                dplyr::pull(julian_day)
-
-            obs_jday[i, seq_along(jday), k] <- jday
-
-        }
     }
 
     ## Convert 3 dimensional array to matrix format
     Y <- matrix(Y, n_sites, max_visits*n_occasions,
-                dimnames = list(pentad_id,
-                                NULL))
+                dimnames = list(pentad_col$Pentad, NULL))
 
-    obs_hours <- matrix(obs_hours, n_sites, max_visits*n_occasions)
-    obs_jday <- matrix(obs_jday, n_sites, max_visits*n_occasions)
+    obs_hours <- matrix(obs_hours, n_sites, max_visits*n_occasions,
+                        dimnames = list(pentad_col$Pentad, NULL))
+
+    obs_jday <- matrix(obs_jday, n_sites, max_visits*n_occasions,
+                       dimnames = list(pentad_col$Pentad, NULL))
 
     ## Create year occasion variable
     year <- matrix(occasion_vec, nrow(Y), n_occasions, byrow = TRUE)
