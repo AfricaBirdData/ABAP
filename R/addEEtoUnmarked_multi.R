@@ -203,7 +203,7 @@ addEEtoUnmarked_multi <- function(umf, ee_assign, ee_data) {
 
             year_cov <- ee_data[[i]] %>%
                 as.data.frame() %>%
-                dplyr::select(-any_of("geometry")) %>%
+                dplyr::select(-dplyr::any_of("geometry")) %>%
                 dplyr::filter(pentad %in% umf_pentads) %>%
                 dplyr::arrange(match(pentad, umf_pentads))
 
@@ -228,7 +228,7 @@ addEEtoUnmarked_multi <- function(umf, ee_assign, ee_data) {
 
         site_cov <- ee_data %>%
             as.data.frame() %>%
-            dplyr::select(-any_of("geometry")) %>%
+            dplyr::select(-dplyr::any_of("geometry")) %>%
             dplyr::filter(pentad %in% umf_pentads) %>%
             dplyr::arrange(match(pentad, umf_pentads))
 
