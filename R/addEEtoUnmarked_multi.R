@@ -205,7 +205,14 @@ addEEtoUnmarked_multi <- function(umf, ee_assign, ee_data) {
                 as.data.frame() %>%
                 dplyr::select(-any_of("geometry")) %>%
                 dplyr::filter(pentad %in% umf_pentads) %>%
-                dplyr::arrange(match(pentad, umf_pentads)) %>%
+                dplyr::arrange(match(pentad, umf_pentads))
+
+            # check that pentads in unmarked data and covariate data are the same
+            if(!identical(year_cov$pentad, umf_pentads)){
+                stop("Pentads in unmarked data and covariate data don't match")
+            }
+
+            year_cov <- year_cov %>%
                 dplyr::select(-pentad)
 
             umf@yearlySiteCovs$new_year_cov <- as.vector(t(as.matrix(year_cov)))
@@ -223,7 +230,14 @@ addEEtoUnmarked_multi <- function(umf, ee_assign, ee_data) {
             as.data.frame() %>%
             dplyr::select(-any_of("geometry")) %>%
             dplyr::filter(pentad %in% umf_pentads) %>%
-            dplyr::arrange(match(pentad, umf_pentads)) %>%
+            dplyr::arrange(match(pentad, umf_pentads))
+
+        # check that pentads in unmarked data and covariate data are the same
+        if(!identical(site_cov$pentad, umf_pentads)){
+            stop("Pentads in unmarked data and covariate data don't match")
+        }
+
+        site_cov <- site_cov %>%
             dplyr::select(-pentad)
 
 
