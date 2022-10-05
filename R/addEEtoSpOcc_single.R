@@ -156,7 +156,7 @@ addEEtoSpOcc_single <- function(spOcc, ee_data) {
         as.data.frame() %>%
         dplyr::select(-dplyr::any_of("geometry")) %>%
         dplyr::filter(pentad %in% spOcc_pentads) %>%
-        dplyr::arrange(pentad)
+        dplyr::arrange(match(pentad, spOcc_pentads))
 
     # check that pentads in spOccupancy data and covariate data are the same
     if(!identical(site_cov$pentad, spOcc_pentads)){
