@@ -61,7 +61,7 @@
 #' um_df <- abapToUnmarked_multi(abap_data = abap_multi, pentads = abap_pentads)
 #' summary(um_df)
 #' }
-abapToUnmarked_multi_v2 <- function(abap_data, pentads = NULL){
+abapToUnmarked_multi <- function(abap_data, pentads = NULL){
 
     if(!requireNamespace("unmarked", quietly = TRUE)) {
         stop("Package unmarked doesn't seem to be installed. Please install before using this function.",
