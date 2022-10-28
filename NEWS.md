@@ -1,3 +1,11 @@
+# ABAP 0.2.0
+
+* Added function to download all cards from a given pentad
+
+* Added function to find a pentad from lon-lat coordinates
+
+* Eliminated dependency from data.table
+
 # ABAP 0.1.1
 
 * Speed up 'abapTo' functions
