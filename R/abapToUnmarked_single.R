@@ -122,6 +122,9 @@ abapToUnmarked_single <- function(abap_data, pentads = NULL){
     obs_jday <- do.call("rbind", format_df$jdaypad)
     rownames(obs_jday) <- format_df$Pentad
 
+    obs_covs <- list(hours = as.data.frame(obs_hours),
+                     jday = as.data.frame(obs_jday))
+
     ## Create unmarked data frame
     if(!is.null(pentads)){
 
