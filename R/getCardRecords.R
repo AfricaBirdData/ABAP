@@ -18,7 +18,7 @@ getCardRecords <- function(.CardNo){
     jsonfile <- rjson::fromJSON(myfile)
 
     out <- jsonfile$data$cards[[1]]$records %>%
-        data.table::rbindlist(fill = TRUE) %>%
+        dplyr::bind_rows() %>%
         dplyr::as_tibble()
 
     if(sum(dim(out)) == 0){
