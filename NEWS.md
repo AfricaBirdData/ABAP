@@ -1,3 +1,9 @@
+# ABAP 0.1.1
+
+* Speed up 'abapTo' functions
+
+* spOccupancy and unmarked objects are ordered by pentad
+
 # ABAP 0.1.0
 
 * Set a standard for variables coming out of Google Earth Engine images. Variables
