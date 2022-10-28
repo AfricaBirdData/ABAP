@@ -18,7 +18,12 @@
 #' computing means, counts, etc. Sometimes we might want to avoid this behaviour
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
-#' @return
+#' @return This function transforms an image collection made of a number of images,
+#' each representing a variable at different times (e.g. NDVI measures in different
+#' months) into a multiband image. Each band in the new image represent a different
+#' time. The advantage of a multiband image over an image collection is that we can
+#' annotate data with all the bands of an image on a single function call, saving
+#' time and data traffic between our machine and GEE servers.
 #' @export
 #'
 #' @examples
@@ -31,6 +36,11 @@
 #'                                      groups = 2008:2019,
 #'                                      reducer = "mean",
 #'                                      unmask = FALSE)
+#'
+#' Find mean (mean) NDVI for each pentad and year
+#' ee_data <- ee$FeatureCollection(assetId)  # assetId must correspond to an asset in your GEE account
+#' pentads_ndvi <- addVarEEimage(ee_data, multiband, "mean")
+#'
 #' }
 EEcollectionToMultiband <- function(collection, dates, band,
                                     group_type, groups,
@@ -39,7 +49,7 @@ EEcollectionToMultiband <- function(collection, dates, band,
 
   # Get image
   if(is.character(collection)){
-    ee_layer <- ee$ImageCollection(collection)$
+    ee_layer <- rgee::ee$ImageCollection(collection)$
       select(band)$
       filterDate(dates[1], dates[2])
   } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
@@ -51,29 +61,29 @@ EEcollectionToMultiband <- function(collection, dates, band,
   }
 
   # Get nominal scale for the layer (native resolution) and projection
-  ee_proj <- ee$Projection(ee_layer$first()$projection())
+  ee_proj <- rgee::ee$Projection(ee_layer$first()$projection())
 
   # Remove missing values (this will depend on the layer)
   if(unmask){
     ee_layer <- ee_layer$map(
-        ee_utils_pyfunc(
-          function(image){
-            return(image$unmask())
-          }))
+      rgee::ee_utils_pyfunc(
+        function(image){
+          return(image$unmask())
+        }))
   }
 
   if(!is.null(reducer)){
 
   # Create a list of groups
-  ee_groups <-  ee$List(groups)
+  ee_groups <-  rgee::ee$List(groups)
 
   # Set filter
-  filter <- paste0("ee_layer$filter(ee$Filter$calendarRange(m, m,'", group_type,"'))$", reducer,"()")
+  filter <- paste0("ee_layer$filter(rgee::ee$Filter$calendarRange(m, m,'", group_type,"'))$", reducer,"()")
 
   # Group and reduce within groups by reducer
-  byGroup <- ee$ImageCollection$fromImages(
+  byGroup <- rgee::ee$ImageCollection$fromImages(
     ee_groups$map(
-      ee_utils_pyfunc(
+      rgee::ee_utils_pyfunc(
         function(m){
           return(eval(parse(text = filter)))
         })))

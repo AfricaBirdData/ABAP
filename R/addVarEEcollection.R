@@ -21,7 +21,13 @@
 #' computing means, counts, etc. Sometimes we might want to avoid this behaviour
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
-#' @return
+#' @return A dataframe similar to \code{ee_pentads} with variables added from the
+#' \code{bands} selected from \code{collection}. Note that following \href{https://github.com/r-spatial/rgee}{rgee}
+#' the name of the new variables will be the selected band (\code{bands} or else
+#' all bands from \code{collection} followed by the spatial reducer \code{spt_reducer}.
+#' The temporal reducer \code{temp_reducer} does not appear in the
+#' name, and therefore, it is up to the user to keep track of how the temporal
+#' reducer summarized the collection.
 #' @export
 #'
 #' @examples
@@ -43,7 +49,7 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
 
   # Get image
   if(is.character(collection)){
-    ee_layer <- ee$ImageCollection(collection)$
+    ee_layer <- rgee::ee$ImageCollection(collection)$
       filterDate(dates[1], dates[2])
   } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
     ee_layer <- collection$
@@ -66,21 +72,25 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
   }
 
   # Reduce to image
-  temp_reducer <- paste0("ee$Reducer$", temp_reducer, "()")
-  ee_layer <- ee_layer$reduce(eval(parse(text = temp_reducer)))
+  ee_temp_reducer <- paste0("rgee::ee$Reducer$", temp_reducer, "()")
+  ee_layer <- ee_layer$reduce(eval(parse(text = ee_temp_reducer)))
 
   # Extract layer values
-  spt_reducer <- paste0("ee$Reducer$", spt_reducer, "()")
+  ee_spt_reducer <- paste0("rgee::ee$Reducer$", spt_reducer, "()")
   pentads_layer <- ee_layer %>%
-    ee$Image$reduceRegions(ee_pentads,
-                           eval(parse(text = spt_reducer)),
-                           scale = scale) %>%
-    ee_as_sf(via = "drive")
+    rgee::ee$Image$reduceRegions(ee_pentads,
+                                 eval(parse(text = ee_spt_reducer)),
+                                 scale = scale) %>%
+    rgee::ee_as_sf(via = "drive")
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){
-    pentads_layer <- pentads_layer %>%
-      dplyr::rename("{bands}" := ncol(pentads_layer) - 1)
+
+      layer_name <- paste0(bands, "_", spt_reducer)
+
+      pentads_layer <- pentads_layer %>%
+          dplyr::rename("{layer_name}" := spt_reducer)
+
   }
 
   # This should do something similar but get problems with maxFeatures

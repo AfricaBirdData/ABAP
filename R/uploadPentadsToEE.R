@@ -56,13 +56,13 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
                p2 = pentads %>%
                  dplyr::slice((halfeats + 1):nfeats))
 
-    eenames <- sprintf("%s/%s", ee_get_assethome(), c("p1", "p2"))
+    eenames <- sprintf("%s/%s", rgee::ee_get_assethome(), c("p1", "p2"))
 
     lapply(seq_along(ps), function(i)
-      sf_as_ee(ps[[i]], assetId = eenames[i], via = "getInfo_to_asset"))
+      rgee::sf_as_ee(ps[[i]], assetId = eenames[i], via = "getInfo_to_asset"))
 
-    eep1 <- ee$FeatureCollection(eenames[1])
-    eep2 <- ee$FeatureCollection(eenames[2])
+    eep1 <- rgee::ee$FeatureCollection(eenames[1])
+    eep2 <- rgee::ee$FeatureCollection(eenames[2])
 
     out <- eep1$merge(eep2)
 
@@ -74,14 +74,27 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
 
   } else {                              # For small objects
 
-    sf_as_ee(pentads,
-             assetId = asset_id,
-             via = "getInfo_to_asset")
+    rgee::sf_as_ee(pentads,
+                   assetId = asset_id,
+                   via = "getInfo_to_asset")
   }
+
+  # check that the asset has been produced and wait longer otherwise
+  assets <- rgee::ee_manage_assetlist(rgee::ee_get_assethome())
+
+  try = 1
+  while(!asset_id %in% assets$ID && try < 10){
+      message(paste("Checking GEE counts status", try+1, "of 10"))
+      Sys.sleep(60)
+      assets <- rgee::ee_manage_assetlist(rgee::ee_get_assethome())
+      try = try + 1
+  }
+
+  message(paste("Asset", asset_id, "created"))
 
   # Load if required
   if(load){
-    out <- ee$FeatureCollection(asset_id)
+    out <- rgee::ee$FeatureCollection(asset_id)
     return(out)
   }
 

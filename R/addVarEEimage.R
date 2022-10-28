@@ -15,7 +15,10 @@
 #' computing means, counts, etc. Sometimes we might want to avoid this behaviour
 #' and use 0 instead of NA. If so, set unmask to TRUE.
 #'
-#' @return
+#' @return A dataframe similar to \code{ee_pentads} with variables added from the
+#' \code{bands} selected from \code{collection}. Note that following \href{https://github.com/r-spatial/rgee}{rgee}
+#' the name of the new variables will be the selected band (\code{bands} or else
+#' all bands from \code{collection} followed by the spatial reducer \code{reducer}.
 #' @export
 #'
 #' @examples
@@ -34,7 +37,7 @@ addVarEEimage <- function(ee_pentads, image, reducer,
 
   # Get image
   if(is.character(image)){
-    ee_layer <- ee$Image(image)
+    ee_layer <- rgee::ee$Image(image)
   } else if("ee.image.Image" %in% class(image)){
     ee_layer <- image
   } else {
@@ -55,17 +58,21 @@ addVarEEimage <- function(ee_pentads, image, reducer,
   scale <- ee_layer$projection()$nominalScale()$getInfo()
 
   # Extract layer values
-  reducer <- paste0("ee$Reducer$", reducer, "()")
+  eeReducer <- paste0("rgee::ee$Reducer$", reducer, "()")
   pentads_layer <- ee_layer %>%
-    ee$Image$reduceRegions(ee_pentads,
-                           eval(parse(text = reducer)),
-                           scale = scale) %>%
-    ee_as_sf(via = "drive")
+    rgee::ee$Image$reduceRegions(ee_pentads,
+                                 eval(parse(text = eeReducer)),
+                                 scale = scale) %>%
+    rgee::ee_as_sf(via = "drive")
 
   # Fix layer name
   if(!is.null(bands) & length(bands) == 1){
-    pentads_layer <- pentads_layer %>%
-      dplyr::rename("{bands}" := ncol(pentads_layer) - 1)
+
+      layer_name <- paste0(bands, "_", reducer)
+
+      pentads_layer <- pentads_layer %>%
+          dplyr::rename("{layer_name}" := reducer)
+
   }
 
   # This should do something similar but get problems with maxFeatures
