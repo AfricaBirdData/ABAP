@@ -133,9 +133,16 @@ addEEtoUnmarked_single <- function(umf, ee_data) {
 
     site_cov <- ee_data %>%
         as.data.frame() %>%
-        dplyr::select(-any_of("geometry")) %>%
+        dplyr::select(-dplyr::any_of("geometry")) %>%
         dplyr::filter(pentad %in% umf_pentads) %>%
-        dplyr::arrange(match(pentad, umf_pentads)) %>%
+        dplyr::arrange(match(pentad, umf_pentads))
+
+    # check that pentads in unmarked data and covariate data are the same
+    if(!identical(site_cov$pentad, umf_pentads)){
+        stop("Pentads in unmarked data and covariate data don't match")
+    }
+
+    site_cov <- site_cov %>%
         dplyr::select(-pentad)
 
     if (is.null(umf@siteCovs)) {
