@@ -23,7 +23,7 @@ jsonToTibble <- function(jsonfile){
       names(df) <- cnames
       return(df)
     }) %>%
-    data.table::rbindlist(fill = TRUE) %>%
+    dplyr::bind_rows() %>%
     dplyr::as_tibble()
 
   return(out)
