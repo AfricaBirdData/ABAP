@@ -46,8 +46,8 @@
 #' year (in terms of notation, the first year is coded as `01`, the second year
 #' as `02`, etc).
 #'
-#' @seealso \code{\link{abapToUnmarked_multi}}, \code{\link{addVarEEimage}},
-#' \code{\link{addVarEEcollection}}
+#' @seealso \code{\link{abapToUnmarked_multi}}, \code{\link[ABDtools]{addVarEEimage}},
+#' \code{\link[ABDtools]{addVarEEcollection}}
 
 #'
 #' @author Dominic Henry <dominic.henry@gmail.com> \cr

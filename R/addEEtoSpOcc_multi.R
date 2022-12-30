@@ -38,7 +38,8 @@
 #' Pachi Cervantes
 #'
 #' @seealso \code{\link{abapToSpOcc_multi}}, \code{\link[spOccupancy]{stPGOcc}},
-#' \code{\link[spOccupancy]{tPGOcc}}
+#' \code{\link[spOccupancy]{tPGOcc}}, \code{\link[ABDtools]{addVarEEimage}},
+#' \code{\link[ABDtools]{addVarEEcollection}}
 #'
 #' @export
 #'

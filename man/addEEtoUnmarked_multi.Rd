@@ -191,8 +191,8 @@ summary(umf_multi_ee4)
  }
 }
 \seealso{
-\code{\link{abapToUnmarked_multi}}, \code{\link{addVarEEimage}},
-\code{\link{addVarEEcollection}}
+\code{\link{abapToUnmarked_multi}}, \code{\link[ABDtools]{addVarEEimage}},
+\code{\link[ABDtools]{addVarEEcollection}}
 }
 \author{
 Dominic Henry \href{mailto:dominic.henry@gmail.com}{dominic.henry@gmail.com} \cr
