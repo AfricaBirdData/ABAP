@@ -90,6 +90,8 @@ abapToSpOcc_multi <- function(abap_data, pentads = NULL, proj_coords = TRUE, sea
     # Extract maximum number of visits in a single season
     if(is.null(seasons)){
 
+        warning("Argument 'seasons' not specified, so assuming a single season.
+                Would you rather use abapToSpOcc_single()?")
         max_visits <- abap_data %>%
             dplyr::count(Pentad) %>%
             dplyr::pull(n) %>%
@@ -200,8 +202,6 @@ abapToSpOcc_multi <- function(abap_data, pentads = NULL, proj_coords = TRUE, sea
         spocc_data <- list(y = Y,
                            coords = pentad_xy,
                            det.covs = list(hours = obs_hours, jday = obs_jday))
-
-        spocc_data <- c(spocc_data, list(coords = pentad_xy))
 
     }
 
