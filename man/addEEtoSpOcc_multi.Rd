@@ -4,7 +4,13 @@
 \alias{addEEtoSpOcc_multi}
 \title{Add Google Earth Engine covariate data to a multi-season spOccupancy data list}
 \usage{
-addEEtoSpOcc_multi(spOcc, ee_data, type = c("occ", "det"), seasons = NULL)
+addEEtoSpOcc_multi(
+  spOcc,
+  ee_data,
+  ee_assign,
+  process = c("occ", "det"),
+  seasons = NULL
+)
 }
 \arguments{
 \item{spOcc}{a list containing ABAP detection/non-detection data returned by
@@ -19,11 +25,17 @@ model formula notation it's recommended that the variable names in the data
 frame are concise and informative, and don't contain spaces. See the example
 below for how to create this data frame after extracting GEE data.}
 
-\item{type}{either 'occ' or 'det' specifying whether the covariate to process
-is affecting occupancy or detection, respectively.}
+\item{ee_assign}{"site" if the covariate only varies between sites or "site-season"
+if the covariate varies across sites and between seasons.}
+
+\item{process}{either 'occ' or 'det' specifying whether the covariate
+is affecting occupancy or detection processes, respectively.}
 
 \item{seasons}{string indicating the name of the variable in \code{ee_data} that should
 be used to define seasons in multi-season models.}
+}
+\value{
+The data list \code{spOcc} with the additional covariates.
 }
 \description{
 Google Earth Engine (GEE) data for each pentad can be extracted
@@ -33,118 +45,113 @@ to a list in order to fit single-species multi-season occupancy models using
 \code{\link[spOccupancy]{stPGOcc}} (spatial) or \code{\link[spOccupancy]{tPGOcc}}
 (non-spatial) from the \code{spOccupancy} package.
 }
+\details{
+If ee_assign = "site-year" ee_data must be a data frame-like object (sf could work)
+with each covariate in one column, the pentad identifier in another column named 'pentad',
+and the season identifier in another column (with the same name specified in \code{season}).
+if ee_assign = "site" ee_data must be a data frame-like object
+with each covariate in one column, and the pentad identifier in another column named 'pentad'.
+}
 \note{
 The numeric ranges of various GEE data can be vastly different so it
 is advised that you scale your covariate data before running an occupancy
-model. See the example below for how to do this.
+model.
 }
 \examples{
 \dontrun{
+ ## rgee and ABDtools are required to annotate data with Google Earth Engine
 library(rgee)
+library(ABDtools)
 library(dplyr)
 
 ## Extract ABAP pentad data
 abap_pentads <- getRegionPentads(.region_type = "province",
-                                .region = "Eastern Cape")
+                                 .region = "Eastern Cape")
 
-## Extract single season ABAP bird data
-abap_single <- getAbapData(.spp_code = 212,
+## Extract multi-season ABAP bird data
+abap_multi <- getAbapData(.spp = 212,
                           .region_type = "province",
                           .region = "Eastern Cape",
-                          .years = 2012)
+                          .years = c(2009,2010,2011,2012))
 
-## Create spOcc list (with X & Y co-ordinates as site covariates)
-spOcc_single <- abapToSpOcc_single(abap_single, abap_pentads)
-str(spOcc_single)
+## We will use years as occupancy reference seasons
+abap_multi$year <- format(abap_multi$StartDate, "\%Y")
+
+## Create unmarked frame (with X & Y coords as site covariates)
+spOcc_multi <- abapToSpOcc_multi(abap_multi, abap_pentads, seasons = "year")
+str(spOcc_multi)
 
 ## Start up GEE
 ee_check()
 ee_Initialize(drive = TRUE)
 
 ## Create assetId for pentads of interest
-assetId <- sprintf("\%s/\%s", ee_get_assethome(), 'EC_pentads')
+assetId <- file.path(ee_get_assethome(), 'EC_pentads')
 
-## Upload to pentads to GEE (only run this once per asset)
-uploadPentadsToEE(pentads = abap_pentads,
-                 asset_id = assetId,
-                 load = FALSE)
+## Upload to pentads to GEE (only run this once per asset) and
+## load the remote asset into R session
+pentads <- uploadFeaturesToEE(feats = abap_pentads,
+                              asset_id = assetId,
+                              load = TRUE)
 
-## Load the remote asset into R session
-pentads <- ee$FeatureCollection(assetId)
+### ADD SITE-YEAR VARIABLES ###
 
-## Extract spatial mean NDVI for each pentad
-ndvi_mean <- addVarEEcollection(ee_pentads = pentads,
-                                  collection = "MODIS/006/MOD13A2",
-                                  dates = c("2010-01-01", "2013-01-01"),
-                                  temp_reducer = "mean",
-                                  spt_reducer = "mean",
-                                  bands = "NDVI")
+## Create a multi-band image with mean NDVI for each year
+ndvi_multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
+                                          dates = c("2009-01-01", "2012-12-31"),
+                                          band = "NDVI",
+                                          group_type = "year",
+                                          groups = 2009:2012,
+                                          reducer = "mean",
+                                          unmask = FALSE)
 
-## Extract spatial standard deviation of NDVI for each pentad
-ndvi_sd <- addVarEEcollection(ee_pentads = pentads,
-                                  collection = "MODIS/006/MOD13A2",
-                                  dates = c("2010-01-01", "2013-01-01"),
-                                  temp_reducer = "mean",
-                                  spt_reducer = "stdDev",
-                                  bands = "NDVI")
+## Find mean and sd NDVI value for each pentad and year from the multi-band image
+ndvi_mean <- addVarEEimage(pentads, ndvi_multiband, "mean")
+ndvi_sd <- addVarEEimage(pentads, ndvi_multiband, "stdDev")
 
-## Extract spatial minimum land surface temperature for each pentad
-lst_min <- addVarEEcollection(ee_pentads = pentads,
-                                 collection = "MODIS/061/MOD11A1",
-                                 dates = c("2010-01-01", "2011-01-01"),
-                                 temp_reducer = "mean",
-                                 spt_reducer = "min",
-                                 bands = "LST_Day_1km")
+## Format the data to include the pentad column and GEE values for each year
+ndvi_mean <- ndvi_mean \%>\%
+    select(pentad, as.character(2009:2012))
 
-## Extract spatial maximum land surface temperature for each pentad
-lst_max <- addVarEEcollection(ee_pentads = pentads,
-                                 collection = "MODIS/061/MOD11A1",
-                                 dates = c("2010-01-01", "2011-01-01"),
-                                 temp_reducer = "mean",
-                                 spt_reducer = "max",
-                                 bands = "LST_Day_1km")
+ndvi_sd <- ndvi_sd \%>\%
+    select(pentad, as.character(2009:2012))
 
-## Create a site covariate data frame for input into addEEtoSpOcc_single().
-## Note the first column is called "pentad" which is a requirement for the
-## function to work properly.
-my_ee_data <- bind_cols(pentad = ndvi_mean$pentad,
-                     ndvi_SD = ndvi_sd$NDVI_stdDev,
-                     ndvi_MEAN = ndvi_mean$NDVI_mean,
-                     temp_MIN = lst_min$LST_Day_1km_min,
-                     temp_MAX = lst_max$LST_Day_1km_max)
+## Create a data frame with covariate columns, pentad and season.
+ee_siteyear <- ndvi_mean \%>\%
+    as.data.frame() \%>\%
+    dplyr::select(-geometry) \%>\%
+    tidyr::pivot_longer(-pentad, names_to = "year", values_to = "ndvi_mean")
 
-## Add GEE covariates to spOcc list
-spOcc_single_ee <- addEEtoSpOcc_single(spOcc = spOcc_single,
-                                     ee_data = my_ee_data)
-str(spOcc_single_ee)
+## Add GEE site-year data to spOccupancy data list. We will add these covariates
+## to the detection process.
+spOcc_multi_ee1 <- addEEtoSpOcc_multi(spOcc_multi,
+                                      ee_data = ee_siteyear,
+                                      ee_assign = "site-season",
+                                      process = "det",
+                                      seasons = "year")
 
+str(spOcc_multi_ee1)
 
-## Scale site covariates if necessary
-spOcc_single_ee$occ.covs <- scale(spOcc_single_ee$occ.covs)
-head(spOcc_single_ee$occ.covs)
-summary(spOcc_single_ee$occ.covs)
+### ADD SITE VARIABLES ###
 
+## Annotate data with mean elevation per pentad
+elev_mean <- addVarEEimage(ee_feats = pentads,
+                           image = "MERIT/DEM/v1_0_3",
+                           reducer = "mean",
+                           bands = "dem",
+                           unmask = FALSE)
 
-## A slightly different example:
-## Annotate ABAP data with multiple bands from a GEE collection
-pentads_tc <- addVarEEcollection(ee_pentads = pentads,
-                                 collection = "IDAHO_EPSCOR/TERRACLIMATE",
-                                 dates = c("2010-01-01", "2011-01-01"),
-                                 temp_reducer = "mean",
-                                 spt_reducer = "mean",
-                                 bands = c("tmmx", "tmmn"))
+## Keep only the columns that we need
+ee_site <- elev_mean \%>\%
+    as.data.frame() \%>\%
+    dplyr::select(pentad, dem_mean)
 
-## Select the variables to transfer to the spOcc list, making sure
-## 'pentad' is amongst them
-my_ee_data <- pentads_tc \%>\%
-    select(pentad, tmmx_mean, tmmn_mean)
-
-## Add GEE covariates to spOcc list
-spOcc_single_ee <- addEEtoSpOcc_single(spOcc = spOcc_single,
-                                     ee_data = my_ee_data)
-
-str(spOcc_single_ee)
-
+## Add GEE site data to spOccupancy data list. We will now add it to the
+## occupancy process.
+spOcc_multi_ee2 <- addEEtoSpOcc_multi(spOcc_multi,
+                                      ee_data = ee_site,
+                                      ee_assign = "site",
+                                      process = "occ")
 }
 }
 \seealso{
