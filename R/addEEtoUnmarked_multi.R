@@ -57,14 +57,15 @@
 #'
 #' @examples
 #' \dontrun{
-#'
+#' ## rgee and ABDtools are required to annotate data with Google Earth Engine
 #' library(rgee)
+#' library(ABDtools)
 #' library(unmarked)
 #' library(dplyr)
 #'
 #' ## Extract ABAP pentad data
 #' abap_pentads <- getRegionPentads(.region_type = "province",
-#'                                 .region = "Eastern Cape")
+#'                                  .region = "Eastern Cape")
 #'
 #' ## Extract multi-season ABAP bird data
 #' abap_multi <- getAbapData(.spp = 212,
@@ -81,12 +82,12 @@
 #' ee_Initialize(drive = TRUE)
 #'
 #' ## Create assetId for pentads of interest
-#' assetId <- sprintf("%s/%s", ee_get_assethome(), 'EC_pentads')
+#' assetId <- file.path(ee_get_assethome(), 'EC_pentads')
 #'
 #' ## Upload to pentads to GEE (only run this once per asset)
 #' uploadPentadsToEE(pentads = abap_pentads,
-#'                  asset_id = assetId,
-#'                  load = FALSE)
+#'                   asset_id = assetId,
+#'                   load = FALSE)
 #'
 #' ## Load the remote asset into R session
 #' pentads <- ee$FeatureCollection(assetId)
@@ -102,20 +103,20 @@
 #'                                           reducer = "mean",
 #'                                           unmask = FALSE)
 #'
-#' ## Find mean and max NDVI value for each pentad and year from the multi-band image
+#' ## Find mean and standard deviation of NDVI value for each pentad and year from the multi-band image
 #' ndvi_mean <- addVarEEimage(pentads, ndvi_multiband, "mean")
-#' ndvi_max <- addVarEEimage(pentads, ndvi_multiband, "max")
+#' ndvi_sd <- addVarEEimage(pentads, ndvi_multiband, "stdDev")
 #'
 #' ## Format the data to include the pentad column and GEE values for each year
-#' ndvi_max <- ndvi_max %>%
-#'    select(pentad, X2009:X2012)
+#' ndvi_mean <- ndvi_mean %>%
+#'     select(pentad, as.character(2009:2012))
 #'
-#' ndvi_min <- ndvi_mean %>%
-#'   select(pentad, X2009:X2012)
+#' ndvi_sd <- ndvi_sd %>%
+#'     select(pentad, as.character(2009:2012))
 #'
 #' ## Create a list where each named element is a multi-season GEE variable which can then be used in addEEtoUnmarked_multi()
-#' ee_siteyear <- list(ndvi_MAX = ndvi_max,
-#'                     ndvi_MIN = ndvi_min)
+#' ee_siteyear <- list(ndvi_mean = ndvi_mean,
+#'                     ndvi_SD = ndvi_sd)
 #'
 #' ## Add GEE site-year data to unmarked frame
 #' umf_multi_ee1 <- addEEtoUnmarked_multi(umf_multi,
@@ -127,23 +128,24 @@
 #' ### ADD SITE VARIABLES ###
 #'
 #' ## Extract spatial minimum land surface temperature for each pentad
-#' lst_min <- addVarEEcollection(ee_pentads = pentads,
-#'                                  collection = "MODIS/061/MOD11A1",
-#'                                  dates = c("2010-01-01", "2012-12-31"),
-#'                                  temp_reducer = "mean",
-#'                                  spt_reducer = "min",
-#'                                  bands = "LST_Day_1km")
+#' lst_min <- addVarEEcollection(ee_feats = pentads,
+#'                               collection = "MODIS/061/MOD11A1",
+#'                               dates = c("2010-01-01", "2012-12-31"),
+#'                               temp_reducer = "mean",
+#'                               spt_reducer = "min",
+#'                               bands = "LST_Day_1km")
 #'
 #' ## Extract spatial maximum land surface temperature for each pentad
-#' lst_max <- addVarEEcollection(ee_pentads = pentads,
-#'                                  collection = "MODIS/061/MOD11A1",
-#'                                  dates = c("2010-01-01", "2012-12-31"),
-#'                                  temp_reducer = "mean",
-#'                                  spt_reducer = "max",
-#'                                  bands = "LST_Day_1km")
+#' lst_max <- addVarEEcollection(ee_feats = pentads,
+#'                               collection = "MODIS/061/MOD11A1",
+#'                               dates = c("2010-01-01", "2012-12-31"),
+#'                               temp_reducer = "mean",
+#'                               spt_reducer = "max",
+#'                               bands = "LST_Day_1km")
 #'
 #' ## Create a site covariate data frame for input into addEEtoUnmarked_multi().
-#' ## Again, note the first column is called "pentad" which is a requirement for the function to work properly.
+#' ## Again, note the first column is called "pentad" which is a requirement for
+#' ## the function to work properly.
 #' ee_site <- bind_cols(pentad = lst_min$pentad,
 #'                      temp_MIN = lst_min$LST_Day_1km_min,
 #'                      temp_MAX = lst_max$LST_Day_1km_max)
@@ -155,7 +157,8 @@
 #'
 #' summary(umf_multi_ee2)
 #'
-#' ## Add GEE site-year data to the unmarked frame that already has site data (using addEEtoUnmarked_multi, site-year or site only data can be added sequentially).
+#' ## Add GEE site-year data to the unmarked frame that already has site data
+#' ## (using addEEtoUnmarked_multi, site-year or site only data can be added sequentially).
 #' umf_multi_ee3 <- addEEtoUnmarked_multi(umf_multi_ee2,
 #'                                        ee_assign = "site-year",
 #'                                        ee_siteyear)
@@ -182,7 +185,6 @@
 #'                                        ee_site_tc)
 #'
 #' summary(umf_multi_ee4)
-#'
 #'  }
 addEEtoUnmarked_multi <- function(umf, ee_assign, ee_data) {
 
