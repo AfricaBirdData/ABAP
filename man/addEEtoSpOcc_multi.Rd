@@ -156,8 +156,7 @@ spOcc_multi_ee2 <- addEEtoSpOcc_multi(spOcc_multi,
 }
 \seealso{
 \code{\link{abapToSpOcc_multi}}, \code{\link[spOccupancy]{stPGOcc}},
-\code{\link[spOccupancy]{tPGOcc}}, \code{\link{addVarEEimage}},
-\code{\link{addVarEEcollection}}
+\code{\link[spOccupancy]{tPGOcc}}
 }
 \author{
 Dominic Henry \href{mailto:dominic.henry@gmail.com}{dominic.henry@gmail.com} \cr
