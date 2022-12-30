@@ -16,6 +16,7 @@ RoxygenNote: 7.2.3
 Imports: 
     dplyr,
     httr,
+    lifecycle,
     lubridate,
     magrittr,
     readr,

@@ -47,6 +47,18 @@ EEcollectionToMultiband <- function(collection, dates, band,
                                     reducer = NULL,
                                     unmask = FALSE){
 
+    lifecycle::deprecate_warn(
+        when = "0.3.0",
+        what = "ABAP::EEcollectionToMultiband()",
+        with = "ABDtools::EEcollectionToMultiband()",
+        details = "A new version of EEcollectionToMultiband() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
+        The ABAP function will be discontinued",
+        id = NULL,
+        always = FALSE,
+        env = rlang::caller_env(),
+        user_env = rlang::caller_env(2)
+    )
+
   # Get image
   if(is.character(collection)){
     ee_layer <- rgee::ee$ImageCollection(collection)$
