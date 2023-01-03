@@ -1,3 +1,9 @@
+# ABAP 0.3.0
+
+* Deprecated ABAP-rgee functions (use ABDtools now)
+
+* Added function to prepare spOccupancy multi-season data
+
 # ABAP 0.2.0
 
 * Added function to download all cards from a given pentad

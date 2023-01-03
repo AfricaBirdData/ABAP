@@ -8,13 +8,8 @@
 
 This packages provides functionality to access, download, and manipulate
 data from the [African Bird Atlas Project](http://www.birdmap.africa/).
-Most of its functionality is experimental (especially that using Google
-Earth Engine) and under development, so use with caution and please send
-any feedback!
-
-For those of you that come from the SABAP package, please note that we
-have changed Sabap by Abap in the functions names so `getSabapData()`
-now becomes `getAbapData()`, etc. Sorry for the inconvenience!
+Some of its functionality is under development, so use with caution and
+please send any feedback!
 
 ## INSTRUCTIONS TO INSTALL
 
@@ -84,6 +79,7 @@ To illustrate the entire workflow with
 pentads.
 
 ``` r
+
 # Find species code
 my_det_data <- searchAbapSpecies("Duck") %>% 
   filter(Common_species == "African Black") %>% 
@@ -109,10 +105,17 @@ mypentads <- getRegionPentads(.region_type = "province",
 We have added some basic functionality to annotate pentads with
 environmental data from Google Earth Engine (GEE). This should make the
 analysis of ABAP data easier and more reproducible. This functionality
-uses the package `rgee`, which translates R code into Python code using
-`reticulate`, and allows us to use the GEE Python client libraries from
-R! You can find extensive documentation about `rgee`
-[here](https://github.com/r-spatial/rgee).
+uses the package `ABDtools`, which needs to be installed using
+
+``` r
+remotes::install_github("AfricaBirdData/ABDtools")
+```
+
+The package `ABDtools` builds upon
+[`rgee`](https://github.com/r-spatial/rgee), which translates R code
+into Python code using `reticulate`, and allows us to use the GEE Python
+client libraries from R! You can find extensive documentation about
+`rgee` [here](https://github.com/r-spatial/rgee).
 
 But first, we need to create a GEE account, install `rgee` (and
 dependencies) and configure our Google Drive to upload and download data
@@ -121,12 +124,12 @@ recommend Google Drive, because it is simple and effective.
 Configuration is a bit of a process, but you will have to do this only
 once.
 
--   To create a GEE account, please follow these
-    [instructions](https://earthengine.google.com/signup/).
--   To install `rgee`, follow these
-    [instructions](https://github.com/r-spatial/rgee#installation).
--   To configure Google Drive, follow these
-    [instructions](https://r-spatial.github.io/rgee/articles/rgee01.html).
+- To create a GEE account, please follow these
+  [instructions](https://earthengine.google.com/signup/).
+- To install `rgee`, follow these
+  [instructions](https://github.com/r-spatial/rgee#installation).
+- To configure Google Drive, follow these
+  [instructions](https://r-spatial.github.io/rgee/articles/rgee01.html).
 
 We have nothing to do with the above steps, so if you get stuck along
 the way, please search the web or contact the developers directly.
@@ -156,18 +159,20 @@ library(rgee)
 # Check installation
 ee_check()
 #> ◉  Python version
-#> ✓ [Ok] /home/pachorris/.virtualenvs/rgee/bin/python v3.6
+#> ✔ [Ok] /home/pachorris/.virtualenvs/rgee/bin/python v3.8
 #> ◉  Python packages:
-#> ✓ [Ok] numpy
-#> ✓ [Ok] earthengine-api
+#> ✔ [Ok] numpy
+#> ✔ [Ok] earthengine-api
 
 # Initialize rgee and Google Drive
 ee_Initialize(drive = TRUE)
-#> ── rgee 1.1.0 ─────────────────────────────────────── earthengine-api 0.1.277 ── 
-#>  ✓ user: not_defined
-#>  ✓ Google Drive credentials: ✓ Google Drive credentials:  FOUND
-#>  ✓ Initializing Google Earth Engine: ✓ Initializing Google Earth Engine:  DONE!
-#>  ✓ Earth Engine account: users/ee-assets 
+#> ── rgee 1.1.5 ─────────────────────────────────────── earthengine-api 0.1.323 ── 
+#>  ✔ user: not_defined
+#>  ✔ Google Drive credentials:
+#> Auto-refreshing stale OAuth token.
+#>  ✔ Google Drive credentials:  FOUND
+#>  ✔ Initializing Google Earth Engine: ✔ Initializing Google Earth Engine:  DONE!
+#>  ✔ Earth Engine account: users/ee-assets 
 #> ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -177,25 +182,26 @@ go!
 ### Uploading data to GEE
 
 Firstly, you will need to upload the data you want to annotate to GEE.
-These data will go to your assets directory in GEE server and it will
-stay there until you remove it. So if you have uploaded some data, you
-don’t have to upload it again. You typically want to make some spatial
-analysis or match of some sort, so you probably want to upload an `sf`
-or `raster` object. In fact, all GEE functions from the ABAP package
-work with pentads, and they must be uploaded from an `sf` object. For
-example to upload all ABAP pentads (remember that these are already on
-an `sf` format!), we can use:
+These data will go to your ‘assets’ directory in the GEE server and it
+will stay there until you remove it. So if you have uploaded some data,
+you don’t have to upload it again.
+
+GEE-related functions from the `ADBtools` package work with spatial data
+and therefore our detection data must be uploaded as spatial objects.
+For example to upload all ABAP pentads (remember that these are already
+on an `sf` format!), we can use:
 
 ``` r
 library(ABAP)
 library(sf)
 library(dplyr, warn.conflicts = FALSE)
+library(ABDtools)
 
 # Load ABAP pentads
 pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 
 # Set an ID for your remote asset (data in GEE)
-assetId <- sprintf("%s/%s", ee_get_assethome(), 'pentads')
+assetId <- file.path(ee_get_assethome(), 'pentads')
 
 # Upload to GEE (if not done already - do this only once)
 uploadPentadsToEE(pentads = pentads,
@@ -207,7 +213,7 @@ ee_pentads <- ee$FeatureCollection(assetId)
 ```
 
 Now, the object `pentads` lives in your machine, but the object
-ee\_pentads lives in the GEE server. You only have a “handle” to it in
+ee_pentads lives in the GEE server. You only have a “handle” to it in
 your machine to manipulate it. This might seem a bit confusing at first
 but you will get used to it.
 
@@ -234,7 +240,8 @@ this case, we will select the mean (i.e., mean water occurrence per
 pixel within each pentad).
 
 ``` r
-pentads_water <- addVarEEimage(ee_pentads = ee_pentads,                   # Note that we need our remote asset here
+
+pentads_water <- addVarEEimage(ee_feats = ee_pentads,                   # Note that we need our remote asset here
                                image = "JRC/GSW1_3/GlobalSurfaceWater",   # You can find this in the code snippet
                                reducer = "mean",
                                bands = "occurrence")
@@ -249,14 +256,13 @@ catalog](https://developers.google.com/earth-engine/datasets/catalog).
 When we want to annotate data with a collection, ABAP offers two
 options:
 
--   We can use `addVarEEcollection` to summarize the image collection
-    over time ( e.g. calculate the mean over a period of time)
+- We can use `addVarEEcollection` to summarize the image collection over
+  time ( e.g. calculate the mean over a period of time)
 
--   Or we can use `addVarEEclosestImage` to annotate each row in the
-    data with the image in the collection that is closest in time. In
-    the ABAP context this is particularly useful to annotate visit data,
-    where we are interested in the conditions observers found during
-    their surveys.
+- Or we can use `addVarEEclosestImage` to annotate each row in the data
+  with the image in the collection that is closest in time. In the ABAP
+  context this is particularly useful to annotate visit data, where we
+  are interested in the conditions observers found during their surveys.
 
 We demonstrate both annotating data with the [TerraClimate
 dataset](https://developers.google.com/earth-engine/datasets/catalog/IDAHO_EPSCOR_TERRACLIMATE).
@@ -264,7 +270,8 @@ If we were interested in the mean minimum temperature across the year
 2010, we could use
 
 ``` r
-pentads_tmmn <- addVarEEcollection(ee_pentads = ee_pentads,                    # Note that we need our remote asset here
+
+pentads_tmmn <- addVarEEcollection(ee_feats = ee_pentads,                    # Note that we need our remote asset here
                                    collection = "IDAHO_EPSCOR/TERRACLIMATE",   # You can find this in the code snippet
                                    dates = c("2010-01-01", "2011-01-01"),
                                    temp_reducer = "mean",
@@ -272,32 +279,51 @@ pentads_tmmn <- addVarEEcollection(ee_pentads = ee_pentads,                    #
                                    bands = "tmmn")
 ```
 
-Note that in this case, we had to specify both a temporal reducer to
-summarize pixel values over time and a spatial reducer, to summarize
-pixel values within pentad. The `dates` argument subsets the whole
-TerraClimate dataset to those images between `dates[1]` (inclusive) and
-`dates[2]` (exclusive).
+Note that in this case, we had to specify a temporal reducer
+`temp_reducer`to summarize pixel values over time. A reducer in GEE is a
+function that summarizes temporal or spatial data. We will see more of
+this later. The `dates` argument subsets the whole TerraClimate dataset
+to those images between `dates[1]` (inclusive) and `dates[2]`
+(exclusive). Effectively, the function computes a summary of the values
+of each pixel (a mean, in this case) across all images (i.e., times), to
+create a single image from the original collection. Then, it uses this
+new image to annotate our data.
 
-If we wanted to annotate with the closest image, instead of with a
-summary over time, then we need to upload visit data with an associated
-date to GEE. Dates must be in a character format (“yyyy-mm-dd”).
+If we wanted to annotate with the closest image in the collection,
+instead of with a summary over time, then we would need to upload visit
+data with an associated date to GEE. Dates must be in a character format
+(“yyyy-mm-dd”) and the variable must be called ‘Date’ (case sensitive).
+We already did some of this at the beginning (please check the section
+‘Uploading data to GEE’ if you can’t remember), but we will need to
+adjust our data slightly to work with TerraClimate data.
+
+TerraClimate offers monthly data and the date associated with each image
+is always the first day of the month. This means that if we have data
+corresponding to a date after the 15th of the month they will be matched
+against the next month, because that’s the one closest in time.
+
+Each image collection has its own convention, and we must check what is
+appropriate in each case. Here, for illustration purposes, we will
+change all dates in our data to be on the first of the month to match
+TerraClimate.
 
 As an example, let’s download ABAP data for the Maccoa Duck in 2010 and
 annotate these data with TerraClimate’s minimum temperature data.
 
 ``` r
+
 # Load ABAP pentads
 pentads <- getRegionPentads(.region_type = "country", .region = "South Africa")
 
 # Download Maccoa Duck
 id <- searchAbapSpecies("Duck") %>% 
-  filter(Common_species == "Maccoa") %>% 
-  pull(SAFRING_No)
+    filter(Common_species == "Maccoa") %>% 
+    pull(SAFRING_No)
 
 visit <- getAbapData(.spp_code = id,
-                      .region_type = "country",
-                      .region = "South Africa",
-                      .years = 2008)
+                     .region_type = "country",
+                     .region = "South Africa",
+                     .years = 2008)
 
 # Make spatial object
 visit <- visit %>% 
@@ -310,24 +336,24 @@ visit <- visit %>%
 # next month. I will change all dates to be on the first of the month for the
 # analysis
 visit <- visit %>% 
-  dplyr::select(CardNo, StartDate, Pentad, TotalHours, Spp) %>% 
-  mutate(Date = lubridate::floor_date(StartDate, "month"))
+    dplyr::select(CardNo, StartDate, Pentad, TotalHours, Spp) %>% 
+    mutate(Date = lubridate::floor_date(StartDate, "month"))
 
 # Load to EE (if not done already)
-assetId <- sprintf("%s/%s", ee_get_assethome(), 'visit2008')
+assetId <- file.path(ee_get_assethome(), 'visit2008')
 
 # Format date and upload to GEE
 visit %>%
-  dplyr::select(CardNo, Pentad, Date) %>%
-  mutate(Date = as.character(Date)) %>%   # GEE doesn't like dates
-  sf_as_ee(assetId = assetId,
-           via = "getInfo_to_asset")
+    dplyr::select(CardNo, Pentad, Date) %>%
+    mutate(Date = as.character(Date)) %>%   # GEE doesn't like dates
+    sf_as_ee(assetId = assetId,
+             via = "getInfo_to_asset")
 
 # Load the remote data asset
 ee_visit <- ee$FeatureCollection(assetId)
 
 # Annotate with GEE TerraClimate
-visit_new <- addVarEEclosestImage(ee_pentads = ee_visit,
+visit_new <- addVarEEclosestImage(ee_feats = ee_visit,
                                   collection = "IDAHO_EPSCOR/TERRACLIMATE",
                                   reducer = "mean",                          # We only need spatial reducer
                                   maxdiff = 15,                              # This is the maximum time difference that GEE checks
@@ -340,22 +366,23 @@ Lastly, we have made a convenience function that converts an image
 collection into a multi-band image. This is useful because you can only
 annotate one image at a time, but all the bands in the image get
 annotated. So if you want to add several variables to your data, you can
-first create a multi-band image and then annotate with all at once. This
-way you minimize the traffic between your machine and GEE servers saving
-precious time and bandwidth.
+first create a multi-band image and then annotate with all bands at
+once. In this way you minimize the traffic between your machine and GEE
+servers saving precious time and bandwidth.
 
 Here we show how to find the mean NDVI for each year between 2008 and
-2010, and with this find the mean NDVI per pentad.
+2010, create a multi-band image and annotate our data with these bands.
 
 ``` r
+
 # Create a multi-band image with mean NDVI for each year
 multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
-                                           dates = c("2008-01-01", "2020-01-01"),
-                                           band = "NDVI",                       # You can find what bands are available from GEE catalog
-                                           group_type = "year",
-                                           groups = 2008:2019,
-                                           reducer = "mean",
-                                           unmask = FALSE)
+                                     dates = c("2008-01-01", "2020-01-01"),
+                                     band = "NDVI",                       # You can find what bands are available from GEE catalog
+                                     group_type = "year",
+                                     groups = 2008:2019,
+                                     reducer = "mean",
+                                     unmask = FALSE)
 
 # Find mean (mean) NDVI for each pentad and year
 pentads_ndvi <- addVarEEimage(ee_pentads, multiband, "mean")
@@ -365,12 +392,12 @@ pentads_ndvi <- addVarEEimage(ee_pentads, multiband, "mean")
 
 First clone the repository to your local machine:
 
--   In RStudio, create a new project
--   In the ‘Create project’ menu, select ‘Version Control’/‘Git’
--   Copy the repository URL (click on the ‘Code’ green button and copy
-    the link)
--   Choose the appropriate directory and ‘Create project’
--   Remember to pull the latest version regularly
+- In RStudio, create a new project
+- In the ‘Create project’ menu, select ‘Version Control’/‘Git’
+- Copy the repository URL (click on the ‘Code’ green button and copy the
+  link)
+- Choose the appropriate directory and ‘Create project’
+- Remember to pull the latest version regularly
 
 For site owners:
 
@@ -384,23 +411,22 @@ To deal with these lurking issues, I would suggest opening and working
 on a topic branch. This is a just a regular branch that has a short
 lifespan. In steps:
 
--   Open a branch at your local machine
--   Push to the remote repo
--   Make your changes in your local machine
--   Commit and push to remote
--   Create pull request:
-    -   In the GitHub repo you will now see an option that notifies of
-        changes in a branch: click compare and pull request.
--   Delete the branch. When you are finished, you will have to delete
-    the new branch in the remote repo (GitHub) and also in your local
-    machine. In your local machine you have to use Git directly, because
-    apparently RStudio doesn´t do it:
-    -   In your local machine, change to master branch.
-    -   Either use the Git GUI (go to branches/delete/select
-        branch/push).
-    -   Or use the console typing ‘git branch -d your\_branch\_name’.
-    -   It might also be necessary to prune remote branches with ‘git
-        remote prune origin’.
+- Open a branch at your local machine
+- Push to the remote repo
+- Make your changes in your local machine
+- Commit and push to remote
+- Create pull request:
+  - In the GitHub repo you will now see an option that notifies of
+    changes in a branch: click compare and pull request.
+- Delete the branch. When you are finished, you will have to delete the
+  new branch in the remote repo (GitHub) and also in your local machine.
+  In your local machine you have to use Git directly, because apparently
+  RStudio doesn´t do it:
+  - In your local machine, change to master branch.
+  - Either use the Git GUI (go to branches/delete/select branch/push).
+  - Or use the console typing ‘git branch -d your_branch_name’.
+  - It might also be necessary to prune remote branches with ‘git remote
+    prune origin’.
 
 Opening branches is quick and easy, so there is no harm in opening
 multiple branches a day. However, it is important to merge and delete

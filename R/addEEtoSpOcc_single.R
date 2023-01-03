@@ -38,15 +38,15 @@
 #'
 #' ## Extract ABAP pentad data
 #' abap_pentads <- getRegionPentads(.region_type = "province",
-#'                                 .region = "Eastern Cape")
+#'                                  .region = "Eastern Cape")
 #'
 #' ## Extract single season ABAP bird data
 #' abap_single <- getAbapData(.spp_code = 212,
-#'                           .region_type = "province",
-#'                           .region = "Eastern Cape",
-#'                           .years = 2012)
+#'                            .region_type = "province",
+#'                            .region = "Eastern Cape",
+#'                            .years = 2012)
 #'
-#' ## Create spOcc list (with X & Y co-ordinates as site covariates)
+#' ## Create spOcc list (with XY coordinates as site covariates)
 #' spOcc_single <- abapToSpOcc_single(abap_single, abap_pentads)
 #' str(spOcc_single)
 #'
@@ -55,60 +55,42 @@
 #' ee_Initialize(drive = TRUE)
 #'
 #' ## Create assetId for pentads of interest
-#' assetId <- sprintf("%s/%s", ee_get_assethome(), 'EC_pentads')
+#' assetId <- file.path(ee_get_assethome(), 'EC_pentads')
 #'
 #' ## Upload to pentads to GEE (only run this once per asset)
 #' uploadPentadsToEE(pentads = abap_pentads,
-#'                  asset_id = assetId,
-#'                  load = FALSE)
+#'                   asset_id = assetId,
+#'                   load = FALSE)
 #'
 #' ## Load the remote asset into R session
 #' pentads <- ee$FeatureCollection(assetId)
 #'
 #' ## Extract spatial mean NDVI for each pentad
 #' ndvi_mean <- addVarEEcollection(ee_pentads = pentads,
-#'                                   collection = "MODIS/006/MOD13A2",
-#'                                   dates = c("2010-01-01", "2013-01-01"),
-#'                                   temp_reducer = "mean",
-#'                                   spt_reducer = "mean",
-#'                                   bands = "NDVI")
+#'                                 collection = "MODIS/006/MOD13A2",
+#'                                 dates = c("2010-01-01", "2013-01-01"),
+#'                                 temp_reducer = "mean",
+#'                                 spt_reducer = "mean",
+#'                                 bands = "NDVI")
 #'
 #' ## Extract spatial standard deviation of NDVI for each pentad
 #' ndvi_sd <- addVarEEcollection(ee_pentads = pentads,
-#'                                   collection = "MODIS/006/MOD13A2",
-#'                                   dates = c("2010-01-01", "2013-01-01"),
-#'                                   temp_reducer = "mean",
-#'                                   spt_reducer = "stdDev",
-#'                                   bands = "NDVI")
-#'
-#' ## Extract spatial minimum land surface temperature for each pentad
-#' lst_min <- addVarEEcollection(ee_pentads = pentads,
-#'                                  collection = "MODIS/061/MOD11A1",
-#'                                  dates = c("2010-01-01", "2011-01-01"),
-#'                                  temp_reducer = "mean",
-#'                                  spt_reducer = "min",
-#'                                  bands = "LST_Day_1km")
-#'
-#' ## Extract spatial maximum land surface temperature for each pentad
-#' lst_max <- addVarEEcollection(ee_pentads = pentads,
-#'                                  collection = "MODIS/061/MOD11A1",
-#'                                  dates = c("2010-01-01", "2011-01-01"),
-#'                                  temp_reducer = "mean",
-#'                                  spt_reducer = "max",
-#'                                  bands = "LST_Day_1km")
+#'                               collection = "MODIS/006/MOD13A2",
+#'                               dates = c("2010-01-01", "2013-01-01"),
+#'                               temp_reducer = "mean",
+#'                               spt_reducer = "stdDev",
+#'                               bands = "NDVI")
 #'
 #' ## Create a site covariate data frame for input into addEEtoSpOcc_single().
 #' ## Note the first column is called "pentad" which is a requirement for the
 #' ## function to work properly.
 #' my_ee_data <- bind_cols(pentad = ndvi_mean$pentad,
-#'                      ndvi_SD = ndvi_sd$NDVI_stdDev,
-#'                      ndvi_MEAN = ndvi_mean$NDVI_mean,
-#'                      temp_MIN = lst_min$LST_Day_1km_min,
-#'                      temp_MAX = lst_max$LST_Day_1km_max)
+#'                         ndvi_SD = ndvi_sd$NDVI_stdDev,
+#'                         ndvi_MEAN = ndvi_mean$NDVI_mean)
 #'
 #' ## Add GEE covariates to spOcc list
 #' spOcc_single_ee <- addEEtoSpOcc_single(spOcc = spOcc_single,
-#'                                      ee_data = my_ee_data)
+#'                                        ee_data = my_ee_data)
 #' str(spOcc_single_ee)
 #'
 #'
@@ -134,7 +116,7 @@
 #'
 #' ## Add GEE covariates to spOcc list
 #' spOcc_single_ee <- addEEtoSpOcc_single(spOcc = spOcc_single,
-#'                                      ee_data = my_ee_data)
+#'                                        ee_data = my_ee_data)
 #'
 #' str(spOcc_single_ee)
 #'
@@ -166,11 +148,12 @@ addEEtoSpOcc_single <- function(spOcc, ee_data) {
     site_cov <- site_cov %>%
         dplyr::select(-pentad)
 
-    if (is.null(spOcc$occ.covs)) {
+    if(is.null(spOcc$occ.covs)) {
         spOcc$occ.covs <- as.matrix(site_cov)
     } else {
         spOcc$occ.covs <- as.matrix(cbind(spOcc$occ.covs, site_cov))
     }
+
 
     return(spOcc)
 }
