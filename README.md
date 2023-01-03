@@ -168,9 +168,7 @@ ee_check()
 ee_Initialize(drive = TRUE)
 #> ── rgee 1.1.5 ─────────────────────────────────────── earthengine-api 0.1.323 ── 
 #>  ✔ user: not_defined
-#>  ✔ Google Drive credentials:
-#> Auto-refreshing stale OAuth token.
-#>  ✔ Google Drive credentials:  FOUND
+#>  ✔ Google Drive credentials: ✔ Google Drive credentials:  FOUND
 #>  ✔ Initializing Google Earth Engine: ✔ Initializing Google Earth Engine:  DONE!
 #>  ✔ Earth Engine account: users/ee-assets 
 #> ────────────────────────────────────────────────────────────────────────────────
@@ -204,9 +202,9 @@ pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 assetId <- file.path(ee_get_assethome(), 'pentads')
 
 # Upload to GEE (if not done already - do this only once)
-uploadPentadsToEE(pentads = pentads,
-                  asset_id = assetId,
-                  load = FALSE)
+uploadFeaturesToEE(feats = pentads,
+                   asset_id = assetId,
+                   load = FALSE)
 
 # Load the remote asset to you local computer to work with it
 ee_pentads <- ee$FeatureCollection(assetId)

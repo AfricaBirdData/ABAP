@@ -192,9 +192,9 @@ pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 assetId <- file.path(ee_get_assethome(), 'pentads')
 
 # Upload to GEE (if not done already - do this only once)
-uploadPentadsToEE(pentads = pentads,
-                  asset_id = assetId,
-                  load = FALSE)
+uploadFeaturesToEE(feats = pentads,
+                   asset_id = assetId,
+                   load = FALSE)
 
 # Load the remote asset to you local computer to work with it
 ee_pentads <- ee$FeatureCollection(assetId)
