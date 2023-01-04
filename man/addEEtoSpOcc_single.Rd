@@ -12,7 +12,7 @@ addEEtoSpOcc_single(spOcc, ee_data)
 
 \item{ee_data}{a data frame with GEE data extracted using \code{\link{addVarEEcollection}}
 or \code{\link{addVarEEimage}}. The data frame needs to contain a column called
-\code{pentads} with the pentad ID from data extracted using the GEE functions.
+\code{pentad} with the pentad ID from data extracted using the GEE functions.
 The remaining columns should only contain the GEE covariate values that are
 intended to be added to the \code{spOccupancy} list. For ease of use in occupancy
 model formula notation it's recommended that the variable names in the data

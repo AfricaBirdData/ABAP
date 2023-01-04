@@ -47,7 +47,7 @@ to a list in order to fit single-species multi-season occupancy models using
 }
 \details{
 If ee_assign = "site-year" ee_data must be a data frame-like object (sf could work)
-with each covariate in one column, the pentad identifier in another column named 'pentad',
+with each covariate in one column, the pentad identifier in another column named \code{pentad},
 and the season identifier in another column (with the same name specified in \code{season}).
 if ee_assign = "site" ee_data must be a data frame-like object
 with each covariate in one column, and the pentad identifier in another column named 'pentad'.
