@@ -88,9 +88,9 @@ ee_Initialize(drive = TRUE)
 assetId <- file.path(ee_get_assethome(), 'EC_pentads')
 
 ## Upload to pentads to GEE (only run this once per asset)
-uploadPentadsToEE(pentads = abap_pentads,
-                  asset_id = assetId,
-                  load = FALSE)
+uploadFeaturesToEE(pentads = abap_pentads,
+                   asset_id = assetId,
+                   load = FALSE)
 
 ## Load the remote asset into R session
 pentads <- ee$FeatureCollection(assetId)
@@ -112,10 +112,10 @@ ndvi_sd <- addVarEEimage(pentads, ndvi_multiband, "stdDev")
 
 ## Format the data to include the pentad column and GEE values for each year
 ndvi_mean <- ndvi_mean \%>\%
-    select(pentad, as.character(2009:2012))
+    select(pentad, paste0("NDVI_", as.character(2009:2012)))
 
 ndvi_sd <- ndvi_sd \%>\%
-    select(pentad, as.character(2009:2012))
+    select(pentad, paste0("NDVI_", as.character(2009:2012)))
 
 ## Create a list where each named element is a multi-season GEE variable which can then be used in addEEtoUnmarked_multi()
 ee_siteyear <- list(ndvi_mean = ndvi_mean,

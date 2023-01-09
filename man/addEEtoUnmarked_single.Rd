@@ -23,6 +23,7 @@ The numeric ranges of various GEE data can be vastly different so it is advised 
 \examples{
 \dontrun{
 library(rgee)
+library(ABDtools)
 library(unmarked)
 library(dplyr)
 
@@ -48,9 +49,9 @@ ee_Initialize(drive = TRUE)
 assetId <- sprintf("\%s/\%s", ee_get_assethome(), 'EC_pentads')
 
 ## Upload to pentads to GEE (only run this once per asset)
-uploadPentadsToEE(pentads = abap_pentads,
-                 asset_id = assetId,
-                 load = FALSE)
+uploadFeaturesToEE(pentads = abap_pentads,
+                   asset_id = assetId,
+                   load = FALSE)
 
 ## Load the remote asset into R session
 pentads <- ee$FeatureCollection(assetId)
