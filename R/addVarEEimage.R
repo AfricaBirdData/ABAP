@@ -39,7 +39,7 @@ addVarEEimage <- function(ee_pentads, image, reducer,
         when = "0.3.0",
         what = "ABAP::addVarEEimage()",
         with = "ABDtools::addVarEEimage()",
-        details = "A new version of EEcollectionToMultiband() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
+        details = "A new version of addVarEEimage() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
         The ABAP function will be discontinued",
         id = NULL,
         always = FALSE,

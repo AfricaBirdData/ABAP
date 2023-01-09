@@ -51,7 +51,7 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
         when = "0.3.0",
         what = "ABAP::addVarEEcollection()",
         with = "ABDtools::addVarEEcollection()",
-        details = "A new version of EEcollectionToMultiband() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
+        details = "A new version of addVarEEcollection() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
         The ABAP function will be discontinued",
         id = NULL,
         always = FALSE,
