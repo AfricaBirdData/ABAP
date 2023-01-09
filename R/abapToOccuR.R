@@ -68,6 +68,10 @@
 #'
 abapToOccuR <- function(abap_data, occasion, pentads, proj_coords = TRUE){
 
+    if(!requireNamespace("occuR", quietly = TRUE)) {
+        warning("Package occuR doesn't seem to be installed. We recommend installing it if you are using this function.")
+    }
+
     # Create visit data
     visit_data <- abap_data %>%
         dplyr::arrange(Pentad, StartDate) %>%
@@ -126,7 +130,7 @@ abapToOccuR <- function(abap_data, occasion, pentads, proj_coords = TRUE){
 
     }
 
-    return(list(site = site_data,
-                visit = visit_data))
+    return(list(site = data.table::as.data.table(site_data),
+                visit = data.table::as.data.table(visit_data)))
 
 }
