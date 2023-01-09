@@ -44,8 +44,8 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
     lifecycle::deprecate_warn(
         when = "0.3.0",
         what = "ABAP::uploadPentadsToEE()",
-        with = "ABDtools::uploadPentadsToEE()",
-        details = "A new version of EEcollectionToMultiband() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
+        with = "ABDtools::uploadFeaturesToEE()",
+        details = "ABAP::uploadPentadsToEE() is replaced by ABDtools::uploadFeaturesToEE() from package ABDtools (https://github.com/AfricaBirdData/ABDtools).
         The ABAP function will be discontinued",
         id = NULL,
         always = FALSE,

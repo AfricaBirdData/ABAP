@@ -48,7 +48,7 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
         when = "0.3.0",
         what = "ABAP::addVarEEclosestImage()",
         with = "ABDtools::addVarEEclosestImage()",
-        details = "A new version of EEcollectionToMultiband() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
+        details = "A new version of addVarEEclosestImage() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
         The ABAP function will be discontinued",
         id = NULL,
         always = FALSE,
