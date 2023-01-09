@@ -118,15 +118,21 @@ abapToOccuR <- function(abap_data, occasion, pentads = NULL, proj_coords = TRUE)
             pentads <- sf::st_transform(pentads, aeaproj)
         }
 
+        ids <- pentads %>%
+            dplyr::filter(pentad %in% pentad_id) %>%
+            dplyr::arrange(match(pentad, site_data$pentad)) %>%
+            dplyr::pull(pentad)
+
         pentad_xy <- pentads %>%
             dplyr::filter(pentad %in% pentad_id) %>%
             dplyr::arrange(match(pentad, site_data$pentad)) %>%
             sf::st_centroid() %>%
-            sf::st_coordinates()
+            sf::st_coordinates() %>%
+            as.data.frame() %>%
+            dplyr::mutate(pentad = ids)
 
         site_data <- site_data %>%
-            dplyr::mutate(X = pentad_xy[,1],
-                          Y = pentad_xy[,2])
+            dplyr::left_join(pentad_xy, by = "pentad")
 
     }
 
