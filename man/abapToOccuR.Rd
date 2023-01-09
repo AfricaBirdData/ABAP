@@ -4,7 +4,7 @@
 \alias{abapToOccuR}
 \title{ABAP to occuR}
 \usage{
-abapToOccuR(abap_data, occasion, pentads, proj_coords = TRUE)
+abapToOccuR(abap_data, occasion, pentads = NULL, proj_coords = TRUE)
 }
 \arguments{
 \item{abap_data}{ABAP data downloaded using \code{\link{getAbapData}}.}
