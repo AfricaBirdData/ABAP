@@ -111,10 +111,10 @@ ndvi_sd <- addVarEEimage(pentads, ndvi_multiband, "stdDev")
 
 ## Format the data to include the pentad column and GEE values for each year
 ndvi_mean <- ndvi_mean \%>\%
-    select(pentad, as.character(2009:2012))
+    select(pentad, paste0("NDVI_", as.character(2009:2012)))
 
 ndvi_sd <- ndvi_sd \%>\%
-    select(pentad, as.character(2009:2012))
+    select(pentad, paste0("NDVI_", as.character(2009:2012)))
 
 ## Create a data frame with covariate columns, pentad and season.
 ee_siteyear <- ndvi_mean \%>\%

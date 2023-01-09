@@ -58,9 +58,9 @@
 #' assetId <- file.path(ee_get_assethome(), 'EC_pentads')
 #'
 #' ## Upload to pentads to GEE (only run this once per asset)
-#' uploadPentadsToEE(pentads = abap_pentads,
-#'                   asset_id = assetId,
-#'                   load = FALSE)
+#' uploadFeaturesToEE(pentads = abap_pentads,
+#'                    asset_id = assetId,
+#'                    load = FALSE)
 #'
 #' ## Load the remote asset into R session
 #' pentads <- ee$FeatureCollection(assetId)
