@@ -170,7 +170,7 @@ abapToOccuR <- function(abap_data, occasion, pentads = NULL, proj_coords = TRUE)
         dplyr::ungroup()
 
     visit_data <- visit_data %>%
-        dplyr::mutate(obs = ifelse(Spp == "-", 0, 1))
+        dplyr::mutate(obs = ifelse(Spp == "-", 0L, 1L))
 
 
     # Create additional covariates (total observation hours and day of year)
