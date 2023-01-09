@@ -66,7 +66,7 @@
 #' occur_data <- abapToOccuR(abap_data, "year")
 #' str(occur_data)
 #'
-abapToOccuR <- function(abap_data, occasion, pentads, proj_coords = TRUE){
+abapToOccuR <- function(abap_data, occasion, pentads = NULL, proj_coords = TRUE){
 
     if(!requireNamespace("occuR", quietly = TRUE)) {
         warning("Package occuR doesn't seem to be installed. We recommend installing it if you are using this function.")
