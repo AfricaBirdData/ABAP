@@ -55,11 +55,18 @@ pentad card and \code{jday} is the Julian day corresponding to the first day of
 atlassing for that card.
 }
 \examples{
+\dontrun{
+library(rgee)
+library(ABDtools)
+library(dplyr)
+
+## Download single-season ABAP data
 abap_data <- getAbapData(.spp_code = 212,
                          .region_type = "province",
                          .region = "Eastern Cape",
                          .years = 2012)
 
+# Download ABAP site spatial data
 abap_pentads <- getRegionPentads(.region_type = "province",
                                  .region = "Eastern Cape")
 
@@ -78,4 +85,76 @@ str(occur_data)
 occur_data <- abapToOccuR(abap_data, "year")
 str(occur_data)
 
+## Transform multi-season ABAP data into occuR data is just as easy
+abap_data <- getAbapData(.spp_code = 212,
+                         .region_type = "province",
+                         .region = "Eastern Cape",
+                         .years = 2012:2015)
+
+# We will use years as occupancy reference seasons
+abap_data$year <- format(abap_data$StartDate, "\%Y")
+
+## Return list for spatial occupancy model
+occur_data <- abapToOccuR(abap_data, occasion = "year", abap_pentads)
+str(occur_data)
+
+### ADD SITE-YEAR VARIABLES ###
+
+## Start up GEE
+ee_check()
+ee_Initialize(drive = TRUE)
+
+## Create assetId for pentads of interest
+assetId <- file.path(ee_get_assethome(), 'EC_pentads')
+
+## Upload to pentads to GEE (only run this once per asset)
+uploadFeaturesToEE(pentads = abap_pentads,
+                   asset_id = assetId,
+                   load = FALSE)
+
+## Load the remote asset into R session
+pentads <- ee$FeatureCollection(assetId)
+
+## Create a multi-band image with mean NDVI for each year
+ndvi_multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
+                                          dates = c("2012-01-01", "2015-12-31"),
+                                          band = "NDVI",
+                                          group_type = "year",
+                                          groups = 2012:2015,
+                                          reducer = "mean",
+                                          unmask = FALSE)
+
+## Find mean and standard deviation of NDVI value for each pentad and year from the multi-band image
+ndvi_mean <- addVarEEimage(pentads, ndvi_multiband, "mean")
+ndvi_sd <- addVarEEimage(pentads, ndvi_multiband, "stdDev")
+
+## Format the data to include the pentad column and GEE values for each year
+ndvi_mean <- ndvi_mean \%>\%
+    select(pentad, paste0("NDVI_", as.character(2012:2015)))
+
+ndvi_sd <- ndvi_sd \%>\%
+    select(pentad, paste0("NDVI_", as.character(2012:2015)))
+
+## occuR data have the structure of regular data frames (they are data tables, but
+## behave very similarly), so there are many ways we can transfer covariate values from
+## other data frame-like objects. Here, we will transfer the value of these variables
+## with dplyr::left_join(), but first we need to give covariates a long format with tidyr
+ndvi_mean_long <- ndvi_mean \%>\%
+    sf::st_drop_geometry() \%>\%
+    tidyr::pivot_longer(-pentad, names_to = "year", values_to = "NDVI_mean") \%>\%
+    mutate(year = gsub("NDVI_", "", year))
+
+ndvi_sd_long <- ndvi_sd \%>\%
+    sf::st_drop_geometry() \%>\%
+    tidyr::pivot_longer(-pentad, names_to = "year", values_to = "NDVI_sd") \%>\%
+    mutate(year = gsub("NDVI_", "", year))
+
+# Transfer variables via join
+occur_data_ee <- occur_data$site \%>\%
+    dplyr::left_join(ndvi_mean_long, by = c("pentad", "year")) \%>\%
+    dplyr::left_join(ndvi_sd_long, by = c("pentad", "year"))
+
+summary(occur_data_ee)
+
+}
 }

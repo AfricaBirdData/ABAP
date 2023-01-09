@@ -34,6 +34,7 @@
 #' @examples
 #' \dontrun{
 #' library(rgee)
+#' library(ABDtools)
 #' library(dplyr)
 #'
 #' ## Extract ABAP pentad data

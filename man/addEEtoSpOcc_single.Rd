@@ -35,6 +35,7 @@ model. See the example below for how to do this.
 \examples{
 \dontrun{
 library(rgee)
+library(ABDtools)
 library(dplyr)
 
 ## Extract ABAP pentad data
