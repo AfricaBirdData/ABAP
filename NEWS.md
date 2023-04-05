@@ -1,5 +1,9 @@
 # ABAP 0.4.0
 
+* Added abapToOccuR()
+
+* Removed rgee as a dependency. It is now a dependeny of ABDtools package
+
 # ABAP 0.3.0
 
 * Deprecated ABAP-rgee functions (use ABDtools now)
