@@ -56,6 +56,7 @@ atlassing for that card.
 }
 \examples{
 \dontrun{
+library(ABAP)
 library(rgee)
 library(ABDtools)
 library(dplyr)
