@@ -1,6 +1,6 @@
 Package: ABAP
 Title: Access to African Bird Atlas Project data from R
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     person(given = "BIRDIE Development Team",
            role = c("aut", "cre"),
@@ -20,7 +20,6 @@ Imports:
     lubridate,
     magrittr,
     readr,
-    rgee,
     rjson,
     sf,
     tidyr
