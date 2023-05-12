@@ -17,31 +17,21 @@
 #' searchAbapSpecies("Fulvous")
 searchAbapSpecies <- function(species){
 
-  # test if species contains letters as opposed to only numbers
-  old <- grepl("[a-z]", species, ignore.case = TRUE)
-
-  if(old){
     url <- paste0("https://api.birdmap.africa/sabap2/v2/search/species/", species)
-  } else {
-    url <- paste0("https://api.birdmap.africa/sabap2/v2/species/info/", species, "?curt=1")
-  }
 
-  # Extract data
-  myfile <- httr::RETRY("GET", url) %>%
-    httr::content(as = "text", encoding = "UTF-8")
+    # Extract data
+    myfile <- httr::RETRY("GET", url) %>%
+        httr::content(as = "text", encoding = "UTF-8")
 
-  if(myfile == ""){
-    stop("We couldn't retrieve your querry. Please check your spelling and try again.")
-  }
+    if(myfile == ""){
+        stop("We couldn't retrieve your querry. Please check your spelling and try again.")
+    }
 
-  jsonfile <- rjson::fromJSON(myfile)
+    jsonfile <- rjson::fromJSON(myfile)
 
-  # Reformat
-  out <- ABAP::jsonToTibble(jsonfile$data)
+    # Reformat
+    out <- ABAP::jsonToTibble(jsonfile$data)
 
-  if(old){
-    names(out)[1] <- "SAFRING_No"
-  }
+    return(out)
 
-  return(out)
 }
