@@ -1,3 +1,5 @@
+# ABAP 0.5.0
+
 # ABAP 0.4.1
 
 -   searchAbapSpecies() uses a single API call for all requests. This implies that field names might have changed

@@ -52,68 +52,13 @@ addVarEEcollection <- function(ee_pentads, collection, dates,
         what = "ABAP::addVarEEcollection()",
         with = "ABDtools::addVarEEcollection()",
         details = "A new version of addVarEEcollection() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
-        The ABAP function will be discontinued",
+        The ABAP function has been discontinued",
         id = NULL,
         always = FALSE,
         env = rlang::caller_env(),
         user_env = rlang::caller_env(2)
     )
 
-  # Get image
-  if(is.character(collection)){
-    ee_layer <- rgee::ee$ImageCollection(collection)$
-      filterDate(dates[1], dates[2])
-  } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
-    ee_layer <- collection$
-      filterDate(dates[1], dates[2])
-  } else {
-    stop("collection must be either a character string or a GEE image collection")
-  }
-
-  # Get nominal scale for the layer (native resolution) and projection
-  scale <- ee_layer$first()$projection()$nominalScale()$getInfo()
-
-  # Subset bands
-  if(!is.null(bands)){
-    ee_layer <- ee_layer$select(bands)
-  }
-
-  # Remove missing values (this will depend on the layer)
-  if(unmask){
-    ee_layer <- ee_layer$unmask()
-  }
-
-  # Reduce to image
-  ee_temp_reducer <- paste0("rgee::ee$Reducer$", temp_reducer, "()")
-  ee_layer <- ee_layer$reduce(eval(parse(text = ee_temp_reducer)))
-
-  # Extract layer values
-  ee_spt_reducer <- paste0("rgee::ee$Reducer$", spt_reducer, "()")
-  pentads_layer <- ee_layer %>%
-    rgee::ee$Image$reduceRegions(ee_pentads,
-                                 eval(parse(text = ee_spt_reducer)),
-                                 scale = scale) %>%
-    rgee::ee_as_sf(via = "drive")
-
-  # Fix layer name
-  if(!is.null(bands) & length(bands) == 1){
-
-      layer_name <- paste0(bands, "_", spt_reducer)
-
-      pentads_layer <- pentads_layer %>%
-          dplyr::rename("{layer_name}" := spt_reducer)
-
-  }
-
-  # This should do something similar but get problems with maxFeatures
-  # pentads_layer <- ee_extract(x = ee_layer,
-  #                                   y = ee_pentads,
-  #                                   fun = eval(parse(text = reducer)),
-  #                                   scale = scale,
-  #                                   sf = TRUE,
-  #                                   via = "drive")
-
-  return(pentads_layer)
-
-
+    message("This function has been discontinued. Please, use ABDtools::addVarEEcollection() instead")
+    message("(https://github.com/AfricaBirdData/ABDtools)")
 }

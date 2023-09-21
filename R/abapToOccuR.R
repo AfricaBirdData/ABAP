@@ -2,7 +2,7 @@
 #'
 #' @description This function transforms a raw ABAP data frame (returned by \code{\link{getAbapData}})
 #' into an list which can be used to fit single-species occupancy models using
-#' the package \code{\href{https://github.com/r-glennie/occuR}{occuR}}. This package
+#' the package \href{https://github.com/r-glennie/occuR}{occuR}. This package
 #' can fit non-linear effects, including spatial, temporal and spatio-temporal effects
 #' using splines.
 #' @param abap_data ABAP data downloaded using \code{\link{getAbapData}}.
@@ -21,7 +21,7 @@
 #' If `pentads` are given then the coordinates of the centroid of the pentads will be
 #' included in site_data.
 #'
-#' @details The \code{\href{https://github.com/r-glennie/occuR}{occuR}} package can
+#' @details The \href{https://github.com/r-glennie/occuR}{occuR} package can
 #' fit spatial effects, for which we need the spatial location of our sites. Within the context
 #' of ABAP, these locations are the centroid of each sampling pentad. In order to
 #' provide these spatial data to this function, simply use \code{\link{getRegionPentads}}
@@ -149,9 +149,9 @@
 
 abapToOccuR <- function(abap_data, occasion, pentads = NULL, proj_coords = TRUE){
 
-    if(!requireNamespace("occuR", quietly = TRUE)) {
-        warning("Package occuR doesn't seem to be installed. We recommend installing it if you are using this function.")
-    }
+    # if(!requireNamespace("occuR", quietly = TRUE)) {
+    #     warning("Package occuR doesn't seem to be installed. We recommend installing it if you are using this function.")
+    # }
 
     # Create visit data
     visit_data <- abap_data %>%

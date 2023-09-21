@@ -40,62 +40,15 @@ addVarEEimage <- function(ee_pentads, image, reducer,
         what = "ABAP::addVarEEimage()",
         with = "ABDtools::addVarEEimage()",
         details = "A new version of addVarEEimage() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
-        The ABAP function will be discontinued",
+        The ABAP function has been discontinued",
         id = NULL,
         always = FALSE,
         env = rlang::caller_env(),
         user_env = rlang::caller_env(2)
     )
 
-  # Get image
-  if(is.character(image)){
-    ee_layer <- rgee::ee$Image(image)
-  } else if("ee.image.Image" %in% class(image)){
-    ee_layer <- image
-  } else {
-    stop("image must be either a character string or a GEE image")
-  }
-
-  # Subset bands
-  if(!is.null(bands)){
-    ee_layer <- ee_layer$select(bands)
-  }
-
-  # Remove missing values (this will depend on the layer)
-  if(unmask){
-    ee_layer <- ee_layer$unmask()
-  }
-
-  # Get nominal scale for the layer (native resolution)
-  scale <- ee_layer$projection()$nominalScale()$getInfo()
-
-  # Extract layer values
-  eeReducer <- paste0("rgee::ee$Reducer$", reducer, "()")
-  pentads_layer <- ee_layer %>%
-    rgee::ee$Image$reduceRegions(ee_pentads,
-                                 eval(parse(text = eeReducer)),
-                                 scale = scale) %>%
-    rgee::ee_as_sf(via = "drive")
-
-  # Fix layer name
-  if(!is.null(bands) & length(bands) == 1){
-
-      layer_name <- paste0(bands, "_", reducer)
-
-      pentads_layer <- pentads_layer %>%
-          dplyr::rename("{layer_name}" := reducer)
-
-  }
-
-  # This should do something similar but get problems with maxFeatures
-  # pentads_layer <- ee_extract(x = ee_layer,
-  #                                   y = ee_pentads,
-  #                                   fun = eval(parse(text = reducer)),
-  #                                   scale = scale,
-  #                                   sf = TRUE,
-  #                                   via = "drive")
-
-  return(pentads_layer)
+    message("This function has been discontinued. Please, use ABDtools::addVarEEimage() instead")
+    message("(https://github.com/AfricaBirdData/ABDtools)")
 
 
 }

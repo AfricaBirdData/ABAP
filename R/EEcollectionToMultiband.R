@@ -52,64 +52,14 @@ EEcollectionToMultiband <- function(collection, dates, band,
         what = "ABAP::EEcollectionToMultiband()",
         with = "ABDtools::EEcollectionToMultiband()",
         details = "A new version of EEcollectionToMultiband() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
-        The ABAP function will be discontinued",
+        The ABAP function has been discontinued",
         id = NULL,
         always = FALSE,
         env = rlang::caller_env(),
         user_env = rlang::caller_env(2)
     )
 
-  # Get image
-  if(is.character(collection)){
-    ee_layer <- rgee::ee$ImageCollection(collection)$
-      select(band)$
-      filterDate(dates[1], dates[2])
-  } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
-    ee_layer <- collection$
-      select(band)$
-      filterDate(dates[1], dates[2])
-  } else {
-    stop("collection must be either a character string or a GEE image collection")
-  }
-
-  # Get nominal scale for the layer (native resolution) and projection
-  ee_proj <- rgee::ee$Projection(ee_layer$first()$projection())
-
-  # Remove missing values (this will depend on the layer)
-  if(unmask){
-    ee_layer <- ee_layer$map(
-      rgee::ee_utils_pyfunc(
-        function(image){
-          return(image$unmask())
-        }))
-  }
-
-  if(!is.null(reducer)){
-
-  # Create a list of groups
-  ee_groups <-  rgee::ee$List(groups)
-
-  # Set filter
-  filter <- paste0("ee_layer$filter(rgee::ee$Filter$calendarRange(m, m,'", group_type,"'))$", reducer,"()")
-
-  # Group and reduce within groups by reducer
-  byGroup <- rgee::ee$ImageCollection$fromImages(
-    ee_groups$map(
-      rgee::ee_utils_pyfunc(
-        function(m){
-          return(eval(parse(text = filter)))
-        })))
-
-  } else {
-
-    byGroup <- ee_layer
-
-  }
-
-  # Transform into a multiband image and reproject
-  stackCollection <- byGroup$toBands()$rename(as.character(groups))$
-    reproject(ee_proj)
-
-  return(stackCollection)
+    message("This function has been discontinued. Please, use ABDtools::EEcollectionToMultiband() instead")
+    message("(https://github.com/AfricaBirdData/ABDtools)")
 
 }

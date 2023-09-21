@@ -49,91 +49,14 @@ addVarEEclosestImage <- function(ee_pentads, collection, reducer, maxdiff,
         what = "ABAP::addVarEEclosestImage()",
         with = "ABDtools::addVarEEclosestImage()",
         details = "A new version of addVarEEclosestImage() is now on package ABDtools (https://github.com/AfricaBirdData/ABDtools).
-        The ABAP function will be discontinued",
+        The ABAP function has been discontinued",
         id = NULL,
         always = FALSE,
         env = rlang::caller_env(),
         user_env = rlang::caller_env(2)
     )
 
-  # Get image
-  if(is.character(collection)){
-    ee_layer <- rgee::ee$ImageCollection(collection)
-  } else if("ee.imagecollection.ImageCollection" %in% class(collection)){
-    ee_layer <- collection
-  } else {
-    stop("collection must be either a character string or a GEE image collection")
-  }
-
-
-  # Get nominal scale for the layer (native resolution) and projection
-  scale <- ee_layer$first()$projection()$nominalScale()$getInfo()
-
-  # Subset bands
-  if(!is.null(bands)){
-    ee_layer <- ee_layer$select(bands)
-  }
-
-  # Remove missing values (this will depend on the layer)
-  if(unmask){
-    ee_layer <- ee_layer$unmask()
-  }
-
-  # Function to add date in milliseconds
-  addTime <- function(feature) {
-    datemillis <- rgee::ee$Date(feature$get('Date'))$millis()
-    return(feature$set(list('date_millis' = datemillis)))
-  }
-
-  # Add date in milliseconds
-  ee_pentads <- ee_pentads$map(addTime)
-
-  # Set filter to select images within max time difference
-  maxDiffFilter = rgee::ee$Filter$maxDifference(
-    difference = maxdiff*24*60*60*1000,        # days * hr * min * sec * milliseconds
-    leftField = "date_millis",                 # Timestamp of the visit
-    rightField = "system:time_start"           # Image date
-  )
-
-  # Set a saveBest join that finds the image closest in time
-  saveBestJoin <- rgee::ee$Join$saveBest(
-    matchKey = "bestImage",
-    measureKey = "timeDiff"
-  )
-
-  # Apply the join
-  best_matches <- saveBestJoin$apply(ee_pentads, ee_layer, maxDiffFilter)
-
-  # Function to add value from the matched image
-  reducer <- paste0("rgee::ee$Reducer$", reducer, "()")
-  add_value <- function(feature){
-
-    # Get the image selected by the join
-    img <- rgee::ee$Image(feature$get("bestImage"))$select(bands)
-
-    # Reduce values within pentad
-    pentad_val <- img$reduceRegion(eval(parse(text = reducer)),
-                                   feature$geometry(),
-                                   scale)
-
-    # Return the data containing value and image date.
-    return(feature$set('val', pentad_val$get(bands),
-                       'DateTimeImage', img$get('system:index')))
-
-  }
-
-  # Add values to the data and download
-  out <- best_matches$map(add_value) %>%
-    rgee::ee_as_sf(via = 'drive')
-
-  # Fix names and variables
-  layer_name <- paste0(bands, "_", reducer)
-
-  out <- out %>%
-      dplyr::rename_with(~gsub("val", layer_name, .x), .cols = dplyr::starts_with("val")) %>%
-      dplyr::select(-c(id, date_millis, bestImage)) %>%
-      dplyr::select(dplyr::everything(), DateTimeImage)
-
-  return(out)
+    message("This function has been discontinued. Please, use ABDtools::addVarEEclosestImage() instead")
+    message("(https://github.com/AfricaBirdData/ABDtools)")
 
 }

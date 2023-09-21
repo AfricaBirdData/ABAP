@@ -46,68 +46,14 @@ uploadPentadsToEE <- function(pentads, asset_id, load = TRUE, max_p = 16250){
         what = "ABAP::uploadPentadsToEE()",
         with = "ABDtools::uploadFeaturesToEE()",
         details = "ABAP::uploadPentadsToEE() is replaced by ABDtools::uploadFeaturesToEE() from package ABDtools (https://github.com/AfricaBirdData/ABDtools).
-        The ABAP function will be discontinued",
+        The ABAP function has been discontinued",
         id = NULL,
         always = FALSE,
         env = rlang::caller_env(),
         user_env = rlang::caller_env(2)
     )
 
-  nfeats <- nrow(pentads)
-
-  # Upload pentads
-
-  if(nfeats > max_p){                                   # For large objects
-
-    print("Object larger than max_p, so splitting in half")
-
-    halfeats <- nfeats %/% 2
-
-    ps <- list(p1 = pentads %>%
-                 dplyr::slice(1:halfeats),
-               p2 = pentads %>%
-                 dplyr::slice((halfeats + 1):nfeats))
-
-    eenames <- sprintf("%s/%s", rgee::ee_get_assethome(), c("p1", "p2"))
-
-    lapply(seq_along(ps), function(i)
-      rgee::sf_as_ee(ps[[i]], assetId = eenames[i], via = "getInfo_to_asset"))
-
-    eep1 <- rgee::ee$FeatureCollection(eenames[1])
-    eep2 <- rgee::ee$FeatureCollection(eenames[2])
-
-    out <- eep1$merge(eep2)
-
-    task <- rgee::ee_table_to_asset(collection = out,
-                                    description = "ABAP merged pentads",
-                                    assetId = asset_id,
-                                    overwrite = TRUE)
-    task$start()
-
-  } else {                              # For small objects
-
-    rgee::sf_as_ee(pentads,
-                   assetId = asset_id,
-                   via = "getInfo_to_asset")
-  }
-
-  # check that the asset has been produced and wait longer otherwise
-  assets <- rgee::ee_manage_assetlist(rgee::ee_get_assethome())
-
-  try = 1
-  while(!asset_id %in% assets$ID && try < 10){
-      message(paste("Checking GEE counts status", try+1, "of 10"))
-      Sys.sleep(60)
-      assets <- rgee::ee_manage_assetlist(rgee::ee_get_assethome())
-      try = try + 1
-  }
-
-  message(paste("Asset", asset_id, "created"))
-
-  # Load if required
-  if(load){
-    out <- rgee::ee$FeatureCollection(asset_id)
-    return(out)
-  }
+  message("This function has been discontinued. Please, use ABDtools::uploadFeaturesToEE() instead")
+  message("(https://github.com/AfricaBirdData/ABDtools)")
 
 }
