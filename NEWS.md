@@ -1,5 +1,8 @@
 # ABAP 0.5.0
 
+- Google Earth Engine-related functions no longer work. Now there is a message
+pointing to ABDtools
+
 # ABAP 0.4.1
 
 -   searchAbapSpecies() uses a single API call for all requests. This implies that field names might have changed
