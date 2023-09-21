@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # ABAP
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/AfricaBirdData/ABAP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AfricaBirdData/ABAP/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This packages provides functionality to access, download, and manipulate data from

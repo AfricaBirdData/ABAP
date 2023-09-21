@@ -6,3 +6,4 @@ beta/*
 ^README\.Rmd$
 data_prep/*
 ^CITATION\.cff$
+^\.github$
