@@ -20,14 +20,25 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 This packages provides functionality to access, download, and manipulate data from
-the [African Bird Atlas Project](http://www.birdmap.africa/). Some of its functionality is
-under development, so use with caution and please send any feedback!
+the [African Bird Atlas Project](http://www.birdmap.africa/). 
+
+The objective is to make these data more accessible and easier to analysis, and
+eventually make our analyses more reproducible.
+
+There is another package named [`CWAC`](https://github.com/AfricaBirdData/CWAC)
+that provides similar functionality, but now to download count data from the
+Coordinated Waterbird Counts project. In addition, there is a companion package
+the [`ABDtools`](https://github.com/AfricaBirdData/ABDtools) package, which adds
+the functionality necessary to annotate data with environmental information from the 
+[Google Earth Engine data catalog](https://developers.google.com/earth-engine/datasets).
+
 
 ## INSTRUCTIONS TO INSTALL
 
 To install from GitHub using the [remotes](https://github.com/r-lib/remotes) package, run:
 
 ```{r, eval=FALSE}
+install.packages("remotes")
 remotes::install_github("AfricaBirdData/ABAP")
 ```
 
@@ -109,263 +120,11 @@ mypentads <- getRegionPentads(.region_type = "province",
 ```
 
 
-## ANNOTATE WITH GOOGLE EARTH ENGINE
+## SOME USE CASES
 
-### Installation
+### Download one species data for a subregion
 
-We have added some basic functionality to annotate pentads with environmental
-data from Google Earth Engine (GEE). This should make the analysis of ABAP data
-easier and more reproducible. This functionality uses the package `ABDtools`,
-which needs to be installed using
-
-```{r, eval=FALSE}
-remotes::install_github("AfricaBirdData/ABDtools")
-```
-
-The package `ABDtools` builds upon [`rgee`](https://github.com/r-spatial/rgee),
-which translates R code into Python code using `reticulate`, and allows us
-to use the GEE Python client libraries from R! You can find extensive documentation
-about `rgee` [here](https://github.com/r-spatial/rgee).
-
-But first, we need to create a GEE account, install `rgee` (and dependencies)
-and configure our Google Drive to upload and download data to and from  GEE.
-There are other ways of upload and download but we recommend Google Drive,
-because it is simple and effective. Configuration is a bit of a process, but you
-will have to do this only once. 
-
- - To create a GEE account, please follow these [instructions](https://earthengine.google.com/signup/).
- - To install `rgee`, follow these [instructions](https://github.com/r-spatial/rgee#installation).
- - To configure Google Drive, follow these [instructions](https://r-spatial.github.io/rgee/articles/rgee01.html).
- 
-We have nothing to do with the above steps, so if you get stuck along the way,
-please search the web or contact the developers directly.
-
-Phew, well done if you managed that! With configuration out of the way, let's
-see how to annotate some pentads. We've coded some wrappers around basic
-functions from the `rgee` package to provide some **basic** functionality without
-having to know almost anything about GEE. However, if you want more complicated
-workflows, we totally recommend learning how to use GEE and `rgee` and exploit 
-their enormous power. It does take some time though and if you just want to 
-annotate your data with some precipitation values, you can totally do it with
-the functions we provide.
-
-### Initialize
-
-Most image processing and handling of spatial features happens in GEE servers.
-Therefore, there will be constant flow of information between our computer
-(client) and GEE servers (server). This information flow happens through
-Google Drive. So when we start our session we need to run.
-
-```{r eval=TRUE}
-# Initialize Earth Engine
-library(rgee)
-
-# Check installation
-ee_check()
-
-# Initialize rgee and Google Drive
-ee_Initialize(drive = TRUE)
-```
-
-Make sure that all tests and checks are passed. If so, you are good to go!
-
-### Uploading data to GEE
-
-Firstly, you will need to upload the data you want to annotate to GEE. These
-data will go to your 'assets' directory in the GEE server and it will stay there
-until you remove it. So if you have uploaded some data, you don't have to 
-upload it again. 
-
-GEE-related functions from the `ADBtools` package work with spatial data and therefore
-our detection data must be uploaded as spatial objects. For example to upload all ABAP pentads (remember
-that these are already on an `sf` format!), we can use:
-
-```{r eval=FALSE}
-library(ABAP)
-library(sf)
-library(dplyr, warn.conflicts = FALSE)
-library(ABDtools)
-
-# Load ABAP pentads
-pentads <- getRegionPentads(.region_type = "province", .region = "North West")
-
-# Set an ID for your remote asset (data in GEE)
-assetId <- file.path(ee_get_assethome(), 'pentads')
-
-# Upload to GEE (if not done already - do this only once)
-uploadFeaturesToEE(feats = pentads,
-                   asset_id = assetId,
-                   load = FALSE)
-
-# Load the remote asset to you local computer to work with it
-ee_pentads <- ee$FeatureCollection(assetId)
-
-```
-
-Now, the object `pentads` lives in your machine, but the object ee_pentads lives
-in the GEE server. You only have a "handle" to it in your machine to manipulate it.
-This might seem a bit confusing at first but you will get used to it.
-
-
-### Annotate pentads with a GEE image
-
-An image in GEE jargon is the same thing as a raster in R. There are also image
-collections which are like raster stacks (we'll see more about these later). You 
-can find a full catalog of what is available in GEE [here](https://developers.google.com/earth-engine/datasets/catalog).
-If you want to use data from a single image you can use the function
-`addVarEEimage`.
-
-For example, let's annotate our ABAP pentads with [surface water occurrence](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_3_GlobalSurfaceWater),
-which is the frequency with which water was present in each pixel. We'll need
-the name of the layer in GEE, which is given in the field "Earth Engine Snippet".
-Images can have multiple bands -- in this case, we select "occurrence".
-
-Finally, images have pixels but our spatial objects are polygons, so we need to
-define some type of summarizing function. The same thing that `raster::extract()`
-would need. In GEE this is called a "reducer". In this case, we will select the
-mean (i.e., mean water occurrence per pixel within each pentad).
-
-
-```{r eval=FALSE}
-
-pentads_water <- addVarEEimage(ee_feats = ee_pentads,                   # Note that we need our remote asset here
-                               image = "JRC/GSW1_3/GlobalSurfaceWater",   # You can find this in the code snippet
-                               reducer = "mean",
-                               bands = "occurrence")
-
-```
-
-### Annotate pentads with a GEE collection
-
-Sometimes data don't come in a single image, but in multiple images. For example,
-we might have one image for each day, week, month, etc. Again, we can check
-all available data in the [GEE catalog](https://developers.google.com/earth-engine/datasets/catalog).
-When we want to annotate data with a collection, ABAP offers two options:
-
- - We can use `addVarEEcollection` to summarize the image collection over time (
- e.g. calculate the mean over a period of time)
- 
- - Or we can use `addVarEEclosestImage` to annotate each row in the data with
- the image in the collection that is closest in time. In the ABAP context this
- is particularly useful to annotate visit data, where we are interested in the 
- conditions observers found during their surveys. 
- 
-We demonstrate both annotating data with the [TerraClimate dataset](https://developers.google.com/earth-engine/datasets/catalog/IDAHO_EPSCOR_TERRACLIMATE).
-If we were interested in the mean minimum temperature across the year 2010, we could use
-
-```{r eval=FALSE}
-
-pentads_tmmn <- addVarEEcollection(ee_feats = ee_pentads,                    # Note that we need our remote asset here
-                                   collection = "IDAHO_EPSCOR/TERRACLIMATE",   # You can find this in the code snippet
-                                   dates = c("2010-01-01", "2011-01-01"),
-                                   temp_reducer = "mean",
-                                   spt_reducer = "mean",
-                                   bands = "tmmn")
-
-```
-
-Note that in this case, we had to specify a temporal reducer `temp_reducer`to summarize
-pixel values over time. A reducer in GEE is a function that summarizes temporal or spatial data.
-We will see more of this later. The `dates` argument subsets the whole TerraClimate dataset to those
-images between `dates[1]` (inclusive) and `dates[2]` (exclusive). Effectively, the
-function computes a summary of the values of each pixel (a mean, in this case) across
-all images (i.e., times), to create a single image from the original collection. Then, it uses
-this new image to annotate our data.
-
-If we wanted to annotate with the closest image in the collection, instead of with a summary over
-time, then we would need to upload visit data with an associated date to GEE. Dates must
-be in a character format ("yyyy-mm-dd") and the variable must be called 'Date' (case sensitive).
-We already did some of this at the beginning (please check the section 'Uploading data to GEE' if you can't remember), but we will need to adjust our data slightly to work with TerraClimate data.
-
-TerraClimate offers monthly data and the date associated with each image is always the
-first day of the month. This means that if we have data corresponding to a date after
-the 15th of the month they will be matched against the next month, because that's the one closest in time.
-
-Each image collection has its own convention, and we must check what is appropriate in each
-case. Here, for illustration purposes, we will change all dates in our data to be on the first
-of the month to match TerraClimate.
-
-As an example, let's download ABAP data for the Maccoa Duck in 2010 and
-annotate these data with TerraClimate's minimum temperature data.
-
-```{r eval=FALSE}
-
-# Load ABAP pentads
-pentads <- getRegionPentads(.region_type = "country", .region = "South Africa")
-
-# Download Maccoa Duck
-id <- searchAbapSpecies("Duck") %>% 
-    filter(Common_species == "Maccoa") %>% 
-    pull(SAFRING_No)
-
-visit <- getAbapData(.spp_code = id,
-                     .region_type = "country",
-                     .region = "South Africa",
-                     .years = 2008)
-
-# Make spatial object
-visit <- visit %>% 
-  left_join(pentads, by = c("Pentad" = "Name")) %>% 
-  st_sf() %>% 
-  filter(!st_is_empty(.))   # Remove rows without geometry
-
-# NOTE: TerraClimate offers monthly data. The date of each image is the beginning of
-# the month, which means that dates after the 15th will be matched against the
-# next month. I will change all dates to be on the first of the month for the
-# analysis
-visit <- visit %>% 
-    dplyr::select(CardNo, StartDate, Pentad, TotalHours, Spp) %>% 
-    mutate(Date = lubridate::floor_date(StartDate, "month"))
-
-# Load to EE (if not done already)
-assetId <- file.path(ee_get_assethome(), 'visit2008')
-
-# Format date and upload to GEE
-visit %>%
-    dplyr::select(CardNo, Pentad, Date) %>%
-    mutate(Date = as.character(Date)) %>%   # GEE doesn't like dates
-    sf_as_ee(assetId = assetId,
-             via = "getInfo_to_asset")
-
-# Load the remote data asset
-ee_visit <- ee$FeatureCollection(assetId)
-
-# Annotate with GEE TerraClimate
-visit_new <- addVarEEclosestImage(ee_feats = ee_visit,
-                                  collection = "IDAHO_EPSCOR/TERRACLIMATE",
-                                  reducer = "mean",                          # We only need spatial reducer
-                                  maxdiff = 15,                              # This is the maximum time difference that GEE checks
-                                  bands = c("tmmn"))
-
-```
-
-### Convert image collection to a multi-band image
-
-Lastly, we have made a convenience function that converts an image collection
-into a multi-band image. This is useful because you can only annotate one
-image at a time, but all the bands in the image get annotated. So if you want to
-add several variables to your data, you can first create a multi-band image and 
-then annotate with all bands at once. In this way you minimize the traffic between your
-machine and GEE servers saving precious time and bandwidth.
-
-Here we show how to find the mean NDVI for each year between 2008 and 2010,
-create a multi-band image and annotate our data with these bands.
-
-```{r eval=FALSE}
-
-# Create a multi-band image with mean NDVI for each year
-multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
-                                     dates = c("2008-01-01", "2020-01-01"),
-                                     band = "NDVI",                       # You can find what bands are available from GEE catalog
-                                     group_type = "year",
-                                     groups = 2008:2019,
-                                     reducer = "mean",
-                                     unmask = FALSE)
-
-# Find mean (mean) NDVI for each pentad and year
-pentads_ndvi <- addVarEEimage(ee_pentads, multiband, "mean")
-
-```
+### Download all species data for a subregion
 
 
 ## INSTRUCTIONS TO CONTRIBUTE CODE
