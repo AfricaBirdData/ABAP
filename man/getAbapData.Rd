@@ -6,7 +6,7 @@
 \usage{
 getAbapData(
   .spp_code,
-  .region_type = c("country", "province", "pentad"),
+  .region_type = c("country", "province", "pentad", "group"),
   .region,
   .years = NULL,
   .adhoc = FALSE
@@ -17,7 +17,7 @@ getAbapData(
 of the species of interest. See searchAbapSpecies.}
 
 \item{.region_type}{The type of region we are interested on.
-Three options: "country", "province" and "pentad".}
+Four options: "country", "province", "pentad" and "group". See details.}
 
 \item{.region}{A character string corresponding to the specific region we are
 interested in. It can be either a country in Southern Africa, a South African
@@ -36,6 +36,19 @@ in that card, or "-" if it wasn't.
 }
 \description{
 Download data from ABAP cards for a region and species
+}
+\details{
+If we specify "group" in the \code{.region} argument the function returns all records
+for a specific group of pentads. Groups of pentads must be created from the
+birdmap.africa websites (e.g., \href{https://sabap2.birdmap.africa/}{SABAP2} or
+\href{https://kenya.birdmap.africa/}{Kenya Bird Map}). You will need to create an
+account. Once logged in, you can create groups from the \code{coverage} menu. Then,
+these groups can be viewed from you home menu. The name of the group is the last
+part of the URL displayed in the browser's navigation bar. For example, I created
+a group named "test_group", and the URL for this group is \verb{https://kenya.birdmap.africa/coverage/group/xxxx_tst_grp}.
+The group name that we need to pass on to the \code{getAbapData()} function is
+\code{xxxx_tst_grp}, the last part of the URL, where \code{xxxx} is your citizen scientist
+number (provided when creating an account).
 }
 \examples{
 getAbapData(123, .region_type = "country", .region = "South Africa")
