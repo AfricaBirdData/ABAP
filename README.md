@@ -10,36 +10,53 @@
 
 This packages provides functionality to access, download, and manipulate
 data from the [African Bird Atlas Project](http://www.birdmap.africa/).
-Some of its functionality is under development, so use with caution and
-please send any feedback!
+
+The objective is to make these data more accessible and easier to
+analysis, and eventually make our analyses more reproducible.
+
+There is another package named
+[`CWAC`](https://github.com/AfricaBirdData/CWAC) that provides similar
+functionality, but now to download count data from the Coordinated
+Waterbird Counts project. In addition, there is a companion package the
+[`ABDtools`](https://github.com/AfricaBirdData/ABDtools) package, which
+adds the functionality necessary to annotate different data formats
+(points and polygons) with environmental information from the [Google
+Earth Engine data
+catalog](https://developers.google.com/earth-engine/datasets).
 
 ## INSTRUCTIONS TO INSTALL
 
-To install from GitHub using the
+To install `ABAP` from GitHub using the
 [remotes](https://github.com/r-lib/remotes) package, run:
 
 ``` r
+install.packages("remotes")
 remotes::install_github("AfricaBirdData/ABAP")
 ```
 
-## DOWNLOAD ABAP DATA
+## DOWNLOAD ABAP DATA FOR A SPECIES
 
 A typical workflow entails defining a region and a species of interest,
 e.g. say we are interested in the occupancy of the African Black Duck in
 the North West province of South Africa:
 
-First find the ABAP code for the species (SAFRING code):
+First find the ABAP code for the species:
 
 ``` r
 library(ABAP)
 library(sf)
+#> Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
 library(dplyr, warn.conflicts = FALSE)
 
 # We can search for all duck species
 ducks <- searchAbapSpecies("Duck")
 
 # Then we can extract the code we are interested in
-ducks[ducks$Common_species == "African Black", "SAFRING_No"]
+ducks[ducks$Common_species == "African Black", "Spp"]
+#> # A tibble: 1 × 1
+#>   Spp  
+#>   <chr>
+#> 1 95
 ```
 
 With our code (95) we can download the data recorded for the region of
@@ -49,22 +66,27 @@ interest:
 my_det_data <- getAbapData(.spp_code = 95, .region_type = "province", .region = "North West")
 ```
 
-Note the trailing dots in the argument names. This makes it easier to
-incorporate this function into other larger functions and workflows.
+Great, but we may be interested in detection data in a set of pentads
+that do not correspond to any particular region. What do we do then?
+Well, although `getAbapData()` allows you to download data from any one
+pentad, it is not advised to use this functionality to loop over a set
+of pentads (unless it is a small set). This is because the algorithm
+will create a query to the remote database for each pentad, resulting in
+a very slow process.
 
-We may be interested in detection data in a set of pentads that do not
-correspond to any particular region. Although getAbapData allows you to
-download data from any one pentad, it is not advised to use this
-functionality to loop over a set of pentads (unless it is a small set).
-this is because the algorithm will create a query for each pentad!
-Resulting in a very slow process. The easiest and fastest way to obtain
-these data is to download a larger region that contains our pentads and
-then filter only those we are interested in.
+There are two ways of making this process more efficient:
 
-For demonstration purposes let’s subset ten random pentads in the North
-West province using the data we just downloaded and download Black Duck
-data for them. This doesn’t make any sense, but hopefully shows the
-point.
+### A spatial subset
+
+One way to obtain data for a set of pentads is to download a larger
+region that contains our pentads of interest and then filter only those
+we are interested in.
+
+If we know the code for the pentads of interest we could just go ahead
+and filter our data. For demonstration purposes let’s subset ten random
+pentads in the North West province using the data we just downloaded.
+This pentad selection probably doesn’t make much sense, but hopefully it
+shows the point.
 
 ``` r
 set.seed(8476)
@@ -76,319 +98,115 @@ pentads_sel <- unique(my_det_data$Pentad) %>%
 det_data_sel <- my_det_data[my_det_data$Pentad %in% pentads_sel,]
 ```
 
-To illustrate the entire workflow with
-[dplyr](https://dplyr.tidyverse.org/), we will use the same selection of
-pentads.
+However, what we usually have is some sort of polygon defining a region
+of interest. If we had an [sf](https://r-spatial.github.io/sf/) polygon,
+we we could extract the pentads contained in the polygon with
 
 ``` r
+# We first download all in the North West province pentads (to match our
+# original selection above as a spatial object.
+nw_pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 
-# Find species code
-my_det_data <- searchAbapSpecies("Duck") %>% 
-  filter(Common_species == "African Black") %>% 
-  pull(SAFRING_No) %>% 
-  # Download ABAP data for the whole North West province
-  getAbapData(.region_type = "province", .region = "North West") %>% 
-  # Filter pentads of interest  
-  filter(Pentad %in% pentads_sel)
+# Here I am just going to create a polygon randomly, but usually you have a polygon
+# that makes sense to you
+my_pol <- data.frame(lon = c(25.1, 27.1),
+                     lat = c(-27.2, -25.2)) %>%
+    st_as_sf(coords = c("lon", "lat"),
+             crs = 4326) %>%  # this is WGS84
+    st_bbox() %>%
+    st_as_sfc()
+
+# Extract pentads within your polygon
+my_pentads <- nw_pentads[my_pol,]  # Convenient way of sub-setting spatial objects!
+
+# Subset ABAP data that falls within your polygon
+det_data_sel <- my_det_data %>%
+    filter(Pentad %in% my_pentads[,"pentad"])
+
+# Plots
+plot(st_geometry(nw_pentads), axes = TRUE, lwd = 0.1, cex.axis = 0.7)
+plot(st_geometry(my_pol), add = TRUE, border = "yellow")
+plot(st_geometry(my_pentads), add = TRUE, col = "red", lwd = 0.1)
 ```
 
-Finally, one can download ABAP pentads of a region of interest in
-[sf](https://r-spatial.github.io/sf/) format (POLYGON).
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+### Use a pentad group
+
+If we specify “group” in the `.region` argument `getAbapData()` returns
+all records for a specific group of pentads. Now, groups of pentads must
+be first created from the birdmap.africa websites (e.g., or ). For this,
+you will need to create an account. Once logged in, you can create
+groups from the coverage menu. Then, these groups can be viewed from you
+home menu. The name of the group is the last part of the URL displayed
+in the browser’s navigation bar. For example, I created a group named
+“test_group”, and the URL for this group is
+`⁠https://kenya.birdmap.africa/coverage/group/xxxx_tst_gr`p⁠. The group
+name th at we need to pass on to the `getAbapData()` function is
+xxxx_tst_grp, the last part of the URL, where xxxx is your citizen
+scientist number (provided when creating an account).
 
 ``` r
-mypentads <- getRegionPentads(.region_type = "province",
-                              .region = "North West")
+# Assuming we have created a group named "test_group" with URL ending in
+# "xxxx_tst_grp" our getAbapData() call is
+my_data <- getAbapData(.spp_code = 95, .region_type = "group", .region = "xxxx_tst_grp")
 ```
 
-## ANNOTATE WITH GOOGLE EARTH ENGINE
+## DOWNLOAD ABAP DATA FOR MULTIPLE SPECIES
 
-### Installation
+At the moment, the process of downloading multi-species data with the
+`ABAP` package consists of combining visit data with card record data.
+This means we first need to:
 
-We have added some basic functionality to annotate pentads with
-environmental data from Google Earth Engine (GEE). This should make the
-analysis of ABAP data easier and more reproducible. This functionality
-uses the package `ABDtools`, which needs to be installed using
+1.  Decide on a spatial and temporal selection of data,
+2.  Download detection data for any species (just as we saw above),
+3.  Extract all cards that correspond to the spatial and temporal
+    selection we made
+4.  Loop through all card numbers, download the data associated with
+    them, and combine
+
+For example, if we wanted to download all data for all species in the
+Limpopo region of South Africa for the years 2018 to 2020.
 
 ``` r
-remotes::install_github("AfricaBirdData/ABDtools")
+# Download detection data for any species. These data contain the code for all
+# the cards submitted to the project, regardless of the species we download.
+sp_data <- getAbapData(.spp = 151, 
+                       .region_type = "province",
+                       .region = "Limpopo",
+                       .years = 2018:2020,
+                       .adhoc = FALSE)
+
+
+# From these data we can extract the cards we are interested in.
+my_cards <- unique(sp_data$CardNo)
+
+# Now, this is the painful part, we need to download the data from all the cards
+# using a loop
+
+# Create an empty data frame
+card_data <- data.frame()
+
+# Loop through cards and download data
+for(i in seq_along(my_cards)){
+    
+    dd <- getCardRecords(.CardNo = my_cards[i])
+    card_data <- bind_rows(card_data, dd)
+    
+}
+
+# To finish up and get a complete data set, we could join the species data with
+# the card data (note that we remove species info from pentad data, because it is
+# related to the first species we selected "randomly")
+final_data <- full_join(pentad_data %>% 
+                            select(-c("Spp", "Sequence", "Common_name", "Taxonomic_name")),
+                        card_data,
+                        by = "CardNo")
 ```
 
-The package `ABDtools` builds upon
-[`rgee`](https://github.com/r-spatial/rgee), which translates R code
-into Python code using `reticulate`, and allows us to use the GEE Python
-client libraries from R! You can find extensive documentation about
-`rgee` [here](https://github.com/r-spatial/rgee).
-
-But first, we need to create a GEE account, install `rgee` (and
-dependencies) and configure our Google Drive to upload and download data
-to and from GEE. There are other ways of upload and download but we
-recommend Google Drive, because it is simple and effective.
-Configuration is a bit of a process, but you will have to do this only
-once.
-
-- To create a GEE account, please follow these
-  [instructions](https://earthengine.google.com/signup/).
-- To install `rgee`, follow these
-  [instructions](https://github.com/r-spatial/rgee#installation).
-- To configure Google Drive, follow these
-  [instructions](https://r-spatial.github.io/rgee/articles/rgee01.html).
-
-We have nothing to do with the above steps, so if you get stuck along
-the way, please search the web or contact the developers directly.
-
-Phew, well done if you managed that! With configuration out of the way,
-let’s see how to annotate some pentads. We’ve coded some wrappers around
-basic functions from the `rgee` package to provide some **basic**
-functionality without having to know almost anything about GEE. However,
-if you want more complicated workflows, we totally recommend learning
-how to use GEE and `rgee` and exploit their enormous power. It does take
-some time though and if you just want to annotate your data with some
-precipitation values, you can totally do it with the functions we
-provide.
-
-### Initialize
-
-Most image processing and handling of spatial features happens in GEE
-servers. Therefore, there will be constant flow of information between
-our computer (client) and GEE servers (server). This information flow
-happens through Google Drive. So when we start our session we need to
-run.
-
-``` r
-# Initialize Earth Engine
-library(rgee)
-
-# Check installation
-ee_check()
-#> ◉  Python version
-#> ✔ [Ok] /home/pachorris/.virtualenvs/rgee/bin/python v3.8
-#> ◉  Python packages:
-#> ✔ [Ok] numpy
-#> ✔ [Ok] earthengine-api
-
-# Initialize rgee and Google Drive
-ee_Initialize(drive = TRUE)
-#> ── rgee 1.1.5 ─────────────────────────────────────── earthengine-api 0.1.323 ── 
-#>  ✔ user: not_defined
-#>  ✔ Google Drive credentials:
-#> Auto-refreshing stale OAuth token.
-#>  ✔ Google Drive credentials:  FOUND
-#>  ✔ Initializing Google Earth Engine: ✔ Initializing Google Earth Engine:  DONE!
-#>  ✔ Earth Engine account: users/ee-assets 
-#> ────────────────────────────────────────────────────────────────────────────────
-```
-
-Make sure that all tests and checks are passed. If so, you are good to
-go!
-
-### Uploading data to GEE
-
-Firstly, you will need to upload the data you want to annotate to GEE.
-These data will go to your ‘assets’ directory in the GEE server and it
-will stay there until you remove it. So if you have uploaded some data,
-you don’t have to upload it again.
-
-GEE-related functions from the `ADBtools` package work with spatial data
-and therefore our detection data must be uploaded as spatial objects.
-For example to upload all ABAP pentads (remember that these are already
-on an `sf` format!), we can use:
-
-``` r
-library(ABAP)
-library(sf)
-library(dplyr, warn.conflicts = FALSE)
-library(ABDtools)
-
-# Load ABAP pentads
-pentads <- getRegionPentads(.region_type = "province", .region = "North West")
-
-# Set an ID for your remote asset (data in GEE)
-assetId <- file.path(ee_get_assethome(), 'pentads')
-
-# Upload to GEE (if not done already - do this only once)
-uploadFeaturesToEE(feats = pentads,
-                   asset_id = assetId,
-                   load = FALSE)
-
-# Load the remote asset to you local computer to work with it
-ee_pentads <- ee$FeatureCollection(assetId)
-```
-
-Now, the object `pentads` lives in your machine, but the object
-ee_pentads lives in the GEE server. You only have a “handle” to it in
-your machine to manipulate it. This might seem a bit confusing at first
-but you will get used to it.
-
-### Annotate pentads with a GEE image
-
-An image in GEE jargon is the same thing as a raster in R. There are
-also image collections which are like raster stacks (we’ll see more
-about these later). You can find a full catalog of what is available in
-GEE [here](https://developers.google.com/earth-engine/datasets/catalog).
-If you want to use data from a single image you can use the function
-`addVarEEimage`.
-
-For example, let’s annotate our ABAP pentads with [surface water
-occurrence](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_3_GlobalSurfaceWater),
-which is the frequency with which water was present in each pixel. We’ll
-need the name of the layer in GEE, which is given in the field “Earth
-Engine Snippet”. Images can have multiple bands – in this case, we
-select “occurrence”.
-
-Finally, images have pixels but our spatial objects are polygons, so we
-need to define some type of summarizing function. The same thing that
-`raster::extract()` would need. In GEE this is called a “reducer”. In
-this case, we will select the mean (i.e., mean water occurrence per
-pixel within each pentad).
-
-``` r
-
-pentads_water <- addVarEEimage(ee_feats = ee_pentads,                   # Note that we need our remote asset here
-                               image = "JRC/GSW1_3/GlobalSurfaceWater",   # You can find this in the code snippet
-                               reducer = "mean",
-                               bands = "occurrence")
-```
-
-### Annotate pentads with a GEE collection
-
-Sometimes data don’t come in a single image, but in multiple images. For
-example, we might have one image for each day, week, month, etc. Again,
-we can check all available data in the [GEE
-catalog](https://developers.google.com/earth-engine/datasets/catalog).
-When we want to annotate data with a collection, ABAP offers two
-options:
-
-- We can use `addVarEEcollection` to summarize the image collection over
-  time ( e.g. calculate the mean over a period of time)
-
-- Or we can use `addVarEEclosestImage` to annotate each row in the data
-  with the image in the collection that is closest in time. In the ABAP
-  context this is particularly useful to annotate visit data, where we
-  are interested in the conditions observers found during their surveys.
-
-We demonstrate both annotating data with the [TerraClimate
-dataset](https://developers.google.com/earth-engine/datasets/catalog/IDAHO_EPSCOR_TERRACLIMATE).
-If we were interested in the mean minimum temperature across the year
-2010, we could use
-
-``` r
-
-pentads_tmmn <- addVarEEcollection(ee_feats = ee_pentads,                    # Note that we need our remote asset here
-                                   collection = "IDAHO_EPSCOR/TERRACLIMATE",   # You can find this in the code snippet
-                                   dates = c("2010-01-01", "2011-01-01"),
-                                   temp_reducer = "mean",
-                                   spt_reducer = "mean",
-                                   bands = "tmmn")
-```
-
-Note that in this case, we had to specify a temporal reducer
-`temp_reducer`to summarize pixel values over time. A reducer in GEE is a
-function that summarizes temporal or spatial data. We will see more of
-this later. The `dates` argument subsets the whole TerraClimate dataset
-to those images between `dates[1]` (inclusive) and `dates[2]`
-(exclusive). Effectively, the function computes a summary of the values
-of each pixel (a mean, in this case) across all images (i.e., times), to
-create a single image from the original collection. Then, it uses this
-new image to annotate our data.
-
-If we wanted to annotate with the closest image in the collection,
-instead of with a summary over time, then we would need to upload visit
-data with an associated date to GEE. Dates must be in a character format
-(“yyyy-mm-dd”) and the variable must be called ‘Date’ (case sensitive).
-We already did some of this at the beginning (please check the section
-‘Uploading data to GEE’ if you can’t remember), but we will need to
-adjust our data slightly to work with TerraClimate data.
-
-TerraClimate offers monthly data and the date associated with each image
-is always the first day of the month. This means that if we have data
-corresponding to a date after the 15th of the month they will be matched
-against the next month, because that’s the one closest in time.
-
-Each image collection has its own convention, and we must check what is
-appropriate in each case. Here, for illustration purposes, we will
-change all dates in our data to be on the first of the month to match
-TerraClimate.
-
-As an example, let’s download ABAP data for the Maccoa Duck in 2010 and
-annotate these data with TerraClimate’s minimum temperature data.
-
-``` r
-
-# Load ABAP pentads
-pentads <- getRegionPentads(.region_type = "country", .region = "South Africa")
-
-# Download Maccoa Duck
-id <- searchAbapSpecies("Duck") %>% 
-    filter(Common_species == "Maccoa") %>% 
-    pull(SAFRING_No)
-
-visit <- getAbapData(.spp_code = id,
-                     .region_type = "country",
-                     .region = "South Africa",
-                     .years = 2008)
-
-# Make spatial object
-visit <- visit %>% 
-  left_join(pentads, by = c("Pentad" = "Name")) %>% 
-  st_sf() %>% 
-  filter(!st_is_empty(.))   # Remove rows without geometry
-
-# NOTE: TerraClimate offers monthly data. The date of each image is the beginning of
-# the month, which means that dates after the 15th will be matched against the
-# next month. I will change all dates to be on the first of the month for the
-# analysis
-visit <- visit %>% 
-    dplyr::select(CardNo, StartDate, Pentad, TotalHours, Spp) %>% 
-    mutate(Date = lubridate::floor_date(StartDate, "month"))
-
-# Load to EE (if not done already)
-assetId <- file.path(ee_get_assethome(), 'visit2008')
-
-# Format date and upload to GEE
-visit %>%
-    dplyr::select(CardNo, Pentad, Date) %>%
-    mutate(Date = as.character(Date)) %>%   # GEE doesn't like dates
-    sf_as_ee(assetId = assetId,
-             via = "getInfo_to_asset")
-
-# Load the remote data asset
-ee_visit <- ee$FeatureCollection(assetId)
-
-# Annotate with GEE TerraClimate
-visit_new <- addVarEEclosestImage(ee_feats = ee_visit,
-                                  collection = "IDAHO_EPSCOR/TERRACLIMATE",
-                                  reducer = "mean",                          # We only need spatial reducer
-                                  maxdiff = 15,                              # This is the maximum time difference that GEE checks
-                                  bands = c("tmmn"))
-```
-
-### Convert image collection to a multi-band image
-
-Lastly, we have made a convenience function that converts an image
-collection into a multi-band image. This is useful because you can only
-annotate one image at a time, but all the bands in the image get
-annotated. So if you want to add several variables to your data, you can
-first create a multi-band image and then annotate with all bands at
-once. In this way you minimize the traffic between your machine and GEE
-servers saving precious time and bandwidth.
-
-Here we show how to find the mean NDVI for each year between 2008 and
-2010, create a multi-band image and annotate our data with these bands.
-
-``` r
-
-# Create a multi-band image with mean NDVI for each year
-multiband <- EEcollectionToMultiband(collection = "MODIS/006/MOD13A2",
-                                     dates = c("2008-01-01", "2020-01-01"),
-                                     band = "NDVI",                       # You can find what bands are available from GEE catalog
-                                     group_type = "year",
-                                     groups = 2008:2019,
-                                     reducer = "mean",
-                                     unmask = FALSE)
-
-# Find mean (mean) NDVI for each pentad and year
-pentads_ndvi <- addVarEEimage(ee_pentads, multiband, "mean")
-```
+In the future we would like to make this process easier by allowing
+multi-card queries to the database, which would make the process much
+more efficient. But for now this is usable workaround.
 
 ## INSTRUCTIONS TO CONTRIBUTE CODE
 
