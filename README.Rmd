@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  eval = TRUE
 )
 ```
 
@@ -29,28 +30,29 @@ There is another package named [`CWAC`](https://github.com/AfricaBirdData/CWAC)
 that provides similar functionality, but now to download count data from the
 Coordinated Waterbird Counts project. In addition, there is a companion package
 the [`ABDtools`](https://github.com/AfricaBirdData/ABDtools) package, which adds
-the functionality necessary to annotate data with environmental information from the 
+the functionality necessary to annotate different data formats (points and polygons)
+with environmental information from the 
 [Google Earth Engine data catalog](https://developers.google.com/earth-engine/datasets).
 
 
 ## INSTRUCTIONS TO INSTALL
 
-To install from GitHub using the [remotes](https://github.com/r-lib/remotes) package, run:
+To install `ABAP` from GitHub using the [remotes](https://github.com/r-lib/remotes) package, run:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 install.packages("remotes")
 remotes::install_github("AfricaBirdData/ABAP")
 ```
 
-## DOWNLOAD ABAP DATA
+## DOWNLOAD ABAP DATA FOR A SPECIES
 
 A typical workflow entails defining a region and a species of interest,
 e.g. say we are interested in the occupancy of the African Black Duck in
 the North West province of South Africa:
 
-First find the ABAP code for the species (SAFRING code):
+First find the ABAP code for the species:
 
-```{r, eval=FALSE}
+```{r}
 library(ABAP)
 library(sf)
 library(dplyr, warn.conflicts = FALSE)
@@ -59,32 +61,36 @@ library(dplyr, warn.conflicts = FALSE)
 ducks <- searchAbapSpecies("Duck")
 
 # Then we can extract the code we are interested in
-ducks[ducks$Common_species == "African Black", "SAFRING_No"]
+ducks[ducks$Common_species == "African Black", "Spp"]
 
 ```
 
 With our code (95) we can download the data recorded for the region of interest:
 
-```{r eval=FALSE}
+```{r}
 my_det_data <- getAbapData(.spp_code = 95, .region_type = "province", .region = "North West")
 ```
 
-Note the trailing dots in the argument names. This makes it easier to incorporate
-this function into other larger functions and workflows.
+Great, but we may be interested in detection data in a set of pentads that do not
+correspond to any particular region. What do we do then? Well, although `getAbapData()`
+allows you to download data from any one pentad, it is not advised to use this
+functionality to loop over a set of pentads (unless it is a small set).
+This is because the algorithm will create a query to the remote database for each
+pentad, resulting in a very slow process. 
 
-We may be interested in detection data in a set of pentads that do not
-correspond to any particular region. Although getAbapData allows you to download
-data from any one pentad, it is not advised to use this functionality to loop
-over a set of pentads (unless it is a small set). this is because the algorithm
-will create a query for each pentad! Resulting in a very slow process. The 
-easiest and fastest way to obtain these data is to download a larger region that
-contains our pentads and then filter only those we are interested in.
+There are two ways of making this process more efficient:
 
-For demonstration purposes let's subset ten random pentads in the North West 
-province using the data we just downloaded and download Black Duck data for them.
-This doesn't make any sense, but hopefully shows the point.
+### A spatial subset 
 
-```{r eval=FALSE}
+One way to obtain data for a set of pentads is to download a larger region that
+contains our pentads of interest and then filter only those we are interested in.
+
+If we know the code for the pentads of interest we could just go ahead and filter
+our data. For demonstration purposes let's subset ten random pentads in the North West 
+province using the data we just downloaded. This pentad selection probably 
+doesn't make much sense, but hopefully it shows the point.
+
+```{r}
 set.seed(8476)
 
 pentads_sel <- unique(my_det_data$Pentad) %>% 
@@ -95,36 +101,111 @@ det_data_sel <- my_det_data[my_det_data$Pentad %in% pentads_sel,]
 
 ```
 
-To illustrate the entire workflow with [dplyr](https://dplyr.tidyverse.org/), 
-we will use the same selection of pentads.
+However, what we usually have is some sort of polygon defining a region of interest.
+If we had an [sf](https://r-spatial.github.io/sf/) polygon, we
+could extract the pentads contained in the polygon with
+
+```{r}
+# We first download all in the North West province pentads (to match our
+# original selection above as a spatial object.
+nw_pentads <- getRegionPentads(.region_type = "province", .region = "North West")
+
+# Here I am just going to create a polygon randomly, but usually you have a polygon
+# that makes sense to you
+my_pol <- data.frame(lon = c(25.1, 27.1),
+                     lat = c(-27.2, -25.2)) %>%
+    st_as_sf(coords = c("lon", "lat"),
+             crs = 4326) %>%  # this is WGS84
+    st_bbox() %>%
+    st_as_sfc()
+
+# Extract pentads within your polygon
+my_pentads <- nw_pentads[my_pol,]  # Convenient way of sub-setting spatial objects!
+
+# Subset ABAP data that falls within your polygon
+det_data_sel <- my_det_data %>%
+    filter(Pentad %in% my_pentads[,"pentad"])
+
+# Plots
+plot(st_geometry(nw_pentads), axes = TRUE, lwd = 0.1, cex.axis = 0.7)
+plot(st_geometry(my_pentads), add = TRUE, col = "red", lwd = 0.1)
+plot(st_geometry(my_pol), add = TRUE, border = "yellow")
+```
+
+### Use a pentad group
+
+If we specify "group" in the `.region` argument `getAbapData()` returns all
+records for a specific group of pentads. Now, groups of pentads must be first 
+created from the birdmap.africa websites (e.g., \href{https://sabap2.birdmap.africa/}{SABAP2} or
+\href{https://kenya.birdmap.africa/}{Kenya Bird Map}). For this, you will need
+to create an account. Once logged in, you can create groups from the coverage menu.
+Then, these groups can be viewed from you home menu. The name of the group is the
+last part of the URL displayed in the browser's navigation bar. For example, 
+I created a group named "test_group", and the URL for this group is 
+`⁠https://kenya.birdmap.africa/coverage/group/xxxx_tst_grp`⁠. The group name th
+at we need to pass on to the `getAbapData()` function is `xxxx_tst_grp`, the last
+part of the URL, where xxxx is your citizen scientist number (provided when creating an account).
 
 ```{r eval=FALSE}
-
-# Find species code
-my_det_data <- searchAbapSpecies("Duck") %>% 
-  filter(Common_species == "African Black") %>% 
-  pull(SAFRING_No) %>% 
-  # Download ABAP data for the whole North West province
-  getAbapData(.region_type = "province", .region = "North West") %>% 
-  # Filter pentads of interest  
-  filter(Pentad %in% pentads_sel)
+# Assuming we have created a group named "test_group" with URL ending in
+# "xxxx_tst_grp" our getAbapData() call is
+my_data <- getAbapData(.spp_code = 95, .region_type = "group", .region = "xxxx_tst_grp")
 
 ```
 
-Finally, one can download ABAP pentads of a region of interest in
-[sf](https://r-spatial.github.io/sf/) format (POLYGON).
+## DOWNLOAD ABAP DATA FOR MULTIPLE SPECIES
+
+At the moment, the process of downloading multi-species data with the `ABAP` package
+consists of combining visit data with card record data. This means we first need to:
+
+1. Decide on a spatial and temporal selection of data,
+2. Download detection data for any species (just as we saw above),
+3. Extract all cards that correspond to the spatial and temporal selection we made
+4. Loop through all card numbers, download the data associated with them, and combine
+
+For example, if we wanted to download all data for all species in the Limpopo
+region of South Africa for the years 2018 to 2020.
 
 ```{r eval=FALSE}
-mypentads <- getRegionPentads(.region_type = "province",
-                              .region = "North West")
+# Download detection data for any species. These data contain the code for all
+# the cards submitted to the project, regardless of the species we download.
+sp_data <- getAbapData(.spp = 151, 
+                       .region_type = "province",
+                       .region = "Limpopo",
+                       .years = 2018:2020,
+                       .adhoc = FALSE)
+
+
+# From these data we can extract the cards we are interested in.
+my_cards <- unique(sp_data$CardNo)
+
+# Now, this is the painful part, we need to download the data from all the cards
+# using a loop
+
+# Create an empty data frame
+card_data <- data.frame()
+
+# Loop through cards and download data
+for(i in seq_along(my_cards)){
+    
+    dd <- getCardRecords(.CardNo = my_cards[i])
+    card_data <- bind_rows(card_data, dd)
+    
+}
+
+# To finish up and get a complete data set, we could join the species data with
+# the card data (note that we remove species info from pentad data, because it is
+# related to the first species we selected "randomly")
+final_data <- full_join(pentad_data %>% 
+                            select(-c("Spp", "Sequence", "Common_name", "Taxonomic_name")),
+                        card_data,
+                        by = "CardNo")
+
 ```
 
-
-## SOME USE CASES
-
-### Download one species data for a subregion
-
-### Download all species data for a subregion
+In the future we would like to make this process easier by allowing multi-card
+queries to the database, which would make the process much more efficient. But
+for now this is usable workaround.
 
 
 ## INSTRUCTIONS TO CONTRIBUTE CODE
