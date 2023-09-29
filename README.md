@@ -45,7 +45,7 @@ First find the ABAP code for the species:
 ``` r
 library(ABAP)
 library(sf)
-#> Linking to GEOS 3.11.2, GDAL 3.6.2, PROJ 9.2.0; sf_use_s2() is TRUE
+#> Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
 library(dplyr, warn.conflicts = FALSE)
 
 # We can search for all duck species
@@ -108,7 +108,8 @@ we could extract the pentads contained in the polygon with
 nw_pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 
 # Here I am just going to create a polygon randomly, but usually you have a polygon
-# that makes sense to you
+# that makes sense to you (possibly you would load it with something like
+# my_pol <- sf::read_sf("path/to/my/polygon.shp") or something similar)
 my_pol <- data.frame(lon = c(25.1, 27.1),
                      lat = c(-27.2, -25.2)) %>%
     st_as_sf(coords = c("lon", "lat"),

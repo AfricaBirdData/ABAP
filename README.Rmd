@@ -111,7 +111,8 @@ could extract the pentads contained in the polygon with
 nw_pentads <- getRegionPentads(.region_type = "province", .region = "North West")
 
 # Here I am just going to create a polygon randomly, but usually you have a polygon
-# that makes sense to you
+# that makes sense to you (possibly you would load it with something like
+# my_pol <- sf::read_sf("path/to/my/polygon.shp") or something similar)
 my_pol <- data.frame(lon = c(25.1, 27.1),
                      lat = c(-27.2, -25.2)) %>%
     st_as_sf(coords = c("lon", "lat"),
