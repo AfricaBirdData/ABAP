@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  eval = FALSE
+  eval = TRUE
 )
 ```
 
@@ -103,7 +103,7 @@ det_data_sel <- my_det_data[my_det_data$Pentad %in% pentads_sel,]
 
 However, what we usually have is some sort of polygon defining a region of interest.
 If we had an [sf](https://r-spatial.github.io/sf/) polygon, we
-we could extract the pentads contained in the polygon with
+could extract the pentads contained in the polygon with
 
 ```{r}
 # We first download all in the North West province pentads (to match our
@@ -128,8 +128,8 @@ det_data_sel <- my_det_data %>%
 
 # Plots
 plot(st_geometry(nw_pentads), axes = TRUE, lwd = 0.1, cex.axis = 0.7)
-plot(st_geometry(my_pol), add = TRUE, border = "yellow")
 plot(st_geometry(my_pentads), add = TRUE, col = "red", lwd = 0.1)
+plot(st_geometry(my_pol), add = TRUE, border = "yellow")
 ```
 
 ### Use a pentad group
@@ -142,8 +142,8 @@ to create an account. Once logged in, you can create groups from the coverage me
 Then, these groups can be viewed from you home menu. The name of the group is the
 last part of the URL displayed in the browser's navigation bar. For example, 
 I created a group named "test_group", and the URL for this group is 
-`⁠https://kenya.birdmap.africa/coverage/group/xxxx_tst_gr`p⁠. The group name th
-at we need to pass on to the `getAbapData()` function is xxxx_tst_grp, the last
+`⁠https://kenya.birdmap.africa/coverage/group/xxxx_tst_grp`⁠. The group name th
+at we need to pass on to the `getAbapData()` function is `xxxx_tst_grp`, the last
 part of the URL, where xxxx is your citizen scientist number (provided when creating an account).
 
 ```{r eval=FALSE}

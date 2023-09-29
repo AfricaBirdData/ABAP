@@ -45,7 +45,7 @@ First find the ABAP code for the species:
 ``` r
 library(ABAP)
 library(sf)
-#> Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE
+#> Linking to GEOS 3.11.2, GDAL 3.6.2, PROJ 9.2.0; sf_use_s2() is TRUE
 library(dplyr, warn.conflicts = FALSE)
 
 # We can search for all duck species
@@ -100,7 +100,7 @@ det_data_sel <- my_det_data[my_det_data$Pentad %in% pentads_sel,]
 
 However, what we usually have is some sort of polygon defining a region
 of interest. If we had an [sf](https://r-spatial.github.io/sf/) polygon,
-we we could extract the pentads contained in the polygon with
+we could extract the pentads contained in the polygon with
 
 ``` r
 # We first download all in the North West province pentads (to match our
@@ -125,8 +125,8 @@ det_data_sel <- my_det_data %>%
 
 # Plots
 plot(st_geometry(nw_pentads), axes = TRUE, lwd = 0.1, cex.axis = 0.7)
-plot(st_geometry(my_pol), add = TRUE, border = "yellow")
 plot(st_geometry(my_pentads), add = TRUE, col = "red", lwd = 0.1)
+plot(st_geometry(my_pol), add = TRUE, border = "yellow")
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
@@ -141,9 +141,9 @@ groups from the coverage menu. Then, these groups can be viewed from you
 home menu. The name of the group is the last part of the URL displayed
 in the browser’s navigation bar. For example, I created a group named
 “test_group”, and the URL for this group is
-`⁠https://kenya.birdmap.africa/coverage/group/xxxx_tst_gr`p⁠. The group
+`⁠https://kenya.birdmap.africa/coverage/group/xxxx_tst_grp`⁠. The group
 name th at we need to pass on to the `getAbapData()` function is
-xxxx_tst_grp, the last part of the URL, where xxxx is your citizen
+`xxxx_tst_grp`, the last part of the URL, where xxxx is your citizen
 scientist number (provided when creating an account).
 
 ``` r
