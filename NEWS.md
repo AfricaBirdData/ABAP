@@ -1,3 +1,7 @@
+# ABAP 0.6.0
+
+- Added pentad "group" as a region option for getAbapData
+
 # ABAP 0.5.0
 
 - Google Earth Engine-related functions no longer work. Now there is a message
