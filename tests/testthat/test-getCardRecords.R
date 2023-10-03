@@ -17,9 +17,9 @@ test_that("we get a tibble", {
 })
 
 
-# For the next tests we need a standard to match the outputs of getAbapData()
+# For the next tests we need a standard to match the outputs of getCardRecords()
 # against. This is found at tests/testthat/fixtures/empty_card_df_yyyymmdd.rds
-# where yyyymmdd is the data of the last file to use as referece. If the
+# where yyyymmdd is the data of the last file to use as reference. If the
 # standard changed, we would need to generate a new file with the new standard
 # and the new date. It would be good to keep all standards for future comparison
 
