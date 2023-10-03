@@ -7,3 +7,4 @@ beta/*
 data_prep/*
 ^CITATION\.cff$
 ^\.github$
+^codecov\.yml$
