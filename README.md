@@ -12,9 +12,11 @@ coverage](https://codecov.io/gh/AfricaBirdData/ABAP/branch/main/graph/badge.svg)
 
 This packages provides functionality to access, download, and manipulate
 data from the [African Bird Atlas Project](http://www.birdmap.africa/).
-
-The objective is to make these data more accessible and easier to
-analysis, and eventually make our analyses more reproducible.
+It is possible to download these same data using the [ABAP
+API](api.birdmap.africa), but being able to pull these data straight
+into R, in a standard format, should make them more accessible, easier
+to analyse, and eventually make our analyses more reliable and
+reproducible.
 
 There is another package named
 [`CWAC`](https://github.com/AfricaBirdData/CWAC) that provides similar
