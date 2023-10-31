@@ -1,0 +1,33 @@
+#' Empty data frame with ABAP visit-level variables
+#'
+#' @description An empty dataset containing all variables associated with ABAP
+#' visit data downloaded with \code{\link{getAbapData}}.
+
+#' @format A data frame with 0 rows and 39 variables:
+#' \describe{
+#'   \item{CardNo}{Card number}
+#'   \item{StartDate}{Date when the card was started}
+#'   \item{EndDate}{Date when the card was closed}
+#'   \item{StartTime}{Date when the card was started}
+#'   \item{Pentad}{Pentad the card corresponds to}
+#'   \item{ObserverNo}{Observer ID number}
+#'   \item{TotalHours}{Total number of hours spent birding}
+#'   \item{Hour1}{Total number of species up to hour 1}
+#'   \item{Hour2}{Total number of species up to hour 2}
+#'   \item{Hour3}{Total number of species up to hour 3}
+#'   \item{Hour4}{Total number of species up to hour 4}
+#'   \item{Hour5}{Total number of species up to hour 5}
+#'   \item{Hour6}{Total number of species up to hour 6}
+#'   \item{Hour7}{Total number of species up to hour 7}
+#'   \item{Hour8}{Total number of species up to hour 8}
+#'   \item{Hour9}{Total number of species up to hour 9}
+#'   \item{Hour10}{Total number of species up to hour 10}
+#'   \item{TotalSpp}{Total number of species detected}
+#'   \item{InclNight}{Whether surveys were conducted at night}
+#'   \item{AllHabitats}{Whether all habitats were surveyed}
+#'   \item{Spp}{A species code if it was detected, "-" otherwise}
+#'   \item{Sequence}{Sequence in which the species was detected}
+#'   \item{Common_name}{Common_name of the species}
+#'   \item{Taxonomic_name}{Taxonomic_name of the species}
+#' }
+"abap_visit_vars"
