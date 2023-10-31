@@ -1,3 +1,7 @@
+# ABAP 0.6.1
+
+- Added documentation explaining visit data variables
+
 # ABAP 0.6.0
 
 - Added pentad "group" as a region option for getAbapData
