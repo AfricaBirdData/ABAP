@@ -1,3 +1,7 @@
+# ABAP 0.6.2
+
+- Added regions available to documentation
+
 # ABAP 0.6.1
 
 - Added documentation explaining visit data variables
