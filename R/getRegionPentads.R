@@ -6,6 +6,12 @@
 #' interested in. It can be either a country in Southern Africa, a South African
 #' province, a project (currently, "SABAP1" or "SABAP2") or a pentad code.
 #'
+#' @details At the moment, ABAP serves data from eleven countries: South Africa,
+#' Botswana, eSwatini, Lesotho, Malawi, Mozambique, Namibia, Zambia, Zimbabwe,
+#' Kenya and Nigeria. Only South African provinces are available: Western Cape,
+#' Eastern Cape, Northern Cape, Free State, Limpopo, Mpumalanga, KwaZulu-Natal,
+#' Gauteng, and Northwest Province.
+#'
 #' @return A simple feature object with those pentads that are contained in the
 #' region of interest. A pentads is considered contained if half of its area
 #' lies within the region.

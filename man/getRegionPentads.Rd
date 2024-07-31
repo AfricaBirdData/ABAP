@@ -22,6 +22,13 @@ lies within the region.
 \description{
 Get ABAP pentads for a certain region
 }
+\details{
+At the moment, ABAP serves data from eleven countries: South Africa,
+Botswana, eSwatini, Lesotho, Malawi, Mozambique, Namibia, Zambia, Zimbabwe,
+Kenya and Nigeria. Only South African provinces are available: Western Cape,
+Eastern Cape, Northern Cape, Free State, Limpopo, Mpumalanga, KwaZulu-Natal,
+Gauteng, and Northwest Province.
+}
 \examples{
 # getRegionPentads(.region_type = "country", .region = "South Africa")
 }
