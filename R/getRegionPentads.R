@@ -28,8 +28,12 @@ getRegionPentads <- function(.region_type, .region){
     url <- paste0("https://api.birdmap.africa/sabap2/v2/pentads/", .region_type,
                   "/", .region, "?format=geoJSON")
 
+    # Download geojson data
+    geojson_file <- httr::GET(url)
+    geojson_content <- httr::content(geojson_file, encoding = "UTF-8", as = "text")
+
     # Extract data
-    pentads <- sf::read_sf(url)
+    pentads <- sf::read_sf(geojson_content)
 
     # Clean and return
     pentads <- pentads %>%
