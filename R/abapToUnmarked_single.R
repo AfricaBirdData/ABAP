@@ -130,14 +130,12 @@ abapToUnmarked_single <- function(abap_data, pentads = NULL){
 
         umf_abap <- unmarked::unmarkedFrameOccu(y = Y,
                                                 siteCovs = pentad_xy,
-                                                obsCovs = obs_covs,
-                                                mapInfo = NULL)
+                                                obsCovs = obs_covs)
 
     } else if (is.null(pentads)){
 
         umf_abap <- unmarked::unmarkedFrameOccu(y = Y,
-                                                obsCovs = obs_covs,
-                                                mapInfo = NULL)
+                                                obsCovs = obs_covs)
     }
 
     return(umf_abap)
