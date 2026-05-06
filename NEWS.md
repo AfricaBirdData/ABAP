@@ -1,3 +1,7 @@
+# ABAP 0.6.3
+
+- Removed unmarked::unmarkedFrameOccu() mapInfo argument
+
 # ABAP 0.6.2
 
 - Added regions available to documentation
